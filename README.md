@@ -76,3 +76,6 @@ versi terbaru; setelah itu offline seperti biasa.
 - Selebihnya (enkripsi AES-256, master password, decoy mode, mode stealth
   kalkulator, kategori, tag, pencarian, generator password, auto-lock,
   clipboard auto-clear, backup/restore) berfungsi penuh.
+
+
+  
