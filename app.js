@@ -171,7 +171,7 @@ function goStage(stage){
     document.getElementById("screen-"+s).classList.toggle("hidden", s!==stage);
   });
   if(stage==="unlocked"){
-    document.getElementById("sidebar").classList.remove("hidden");
+    openSidebarPanel();
     renderSidebar();
     renderEntryList();
     setupAutoLock();
@@ -848,6 +848,14 @@ document.querySelectorAll("[data-calc]").forEach(btn=>{
 /* ==================================================================
    Sidebar / topbar static bindings
    ================================================================== */
+function openSidebarPanel(){
+  document.getElementById("sidebar").classList.remove("hidden");
+  if(window.innerWidth<=680) document.getElementById("sidebar-backdrop").classList.remove("hidden");
+}
+function closeSidebarPanel(){
+  document.getElementById("sidebar").classList.add("hidden");
+  document.getElementById("sidebar-backdrop").classList.add("hidden");
+}
 document.getElementById("sidebar").addEventListener("click",(e)=>{
   const quickBtn = e.target.closest("[data-quick]");
   const catBtn = e.target.closest("[data-cat]");
@@ -867,12 +875,18 @@ document.getElementById("sidebar").addEventListener("click",(e)=>{
     State.view.filterTag = State.view.filterTag===t? null : t;
     State.view.filterCat=null; State.view.filterFav=false; State.view.filterRecent=false;
     renderSidebar(); renderEntryList();
+  } else {
+    return;
   }
+  if(window.innerWidth<=680) closeSidebarPanel();
 });
 document.getElementById("sb-settings-btn").addEventListener("click", openSettings);
 document.getElementById("sb-lock-btn").addEventListener("click", lockVault);
+document.getElementById("sidebar-close-btn").addEventListener("click", closeSidebarPanel);
+document.getElementById("sidebar-backdrop").addEventListener("click", closeSidebarPanel);
 document.getElementById("menu-btn").addEventListener("click", ()=>{
-  document.getElementById("sidebar").classList.toggle("hidden");
+  const isHidden = document.getElementById("sidebar").classList.contains("hidden");
+  if(isHidden) openSidebarPanel(); else closeSidebarPanel();
 });
 document.getElementById("search-input").addEventListener("input",(e)=>{ State.view.searchQ = e.target.value; renderEntryList(); });
 document.getElementById("add-btn").addEventListener("click", ()=>openForm(null));
