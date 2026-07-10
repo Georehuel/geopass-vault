@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GeoPass">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="icon" href="icons/icon-192.png">
+<link rel="icon" id="app-favicon" href="icons/icon-192.png">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -116,10 +116,6 @@
         <button class="icon-btn" id="form-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div class="modal-body">
-        <div class="field" id="field-template-wrap">
-          <div class="field-label">Template</div>
-          <select id="form-template" class="input"></select>
-        </div>
         <div class="field">
           <div class="field-label">Judul *</div>
           <input id="form-titlefield" class="input" placeholder="mis. GitHub Kerja">
@@ -128,17 +124,11 @@
           <div class="field-label">Kategori</div>
           <select id="form-category" class="input"></select>
         </div>
-        <div class="field"><div class="field-label">Website</div><input id="form-website" class="input" placeholder="https://"></div>
-        <div class="field"><div class="field-label">Email</div><input id="form-email" class="input"></div>
-        <div class="field"><div class="field-label">Username</div><input id="form-username" class="input"></div>
-        <div class="field">
-          <div class="field-label-row"><div class="field-label">Password</div><button id="form-gen-toggle" class="link-btn">⟳ Generator</button></div>
-          <input id="form-password" class="input mono" autocomplete="new-password">
-          <div id="form-strength" class="strength"></div>
-          <div id="form-generator" class="generator hidden"></div>
+        <div id="form-fields-container"></div>
+        <div class="field" id="add-field-wrap">
+          <button id="add-field-btn" class="btn" style="width:100%;font-size:13px;">+ Tambah Field</button>
+          <div id="add-field-menu" class="generator hidden"></div>
         </div>
-        <div class="field"><div class="field-label">PIN</div><input id="form-pin" class="input mono"></div>
-        <div class="field"><div class="field-label">Catatan</div><textarea id="form-notes" class="input" rows="3"></textarea></div>
         <div class="field">
           <div class="field-label">Tag</div>
           <div id="form-tags-chips" class="chips"></div>

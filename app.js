@@ -3,24 +3,21 @@
 /* ==================================================================
    Constants
    ================================================================== */
-const DEFAULT_CATEGORIES = ["Website","Sosial Media","Bank","Keuangan","Server","Pekerjaan","Pribadi","Lisensi","API","WiFi"];
+const DEFAULT_CATEGORIES = ["Sosial Media","Keuangan","Pekerjaan","Pribadi"];
+const NO_CATEGORY = ""; // pseudo-category: entries with category === "" show under "Tanpa Kategori"
 const SUGGESTED_TAGS = ["Penting","Kerja","Pribadi","2FA","Lama","Baru"];
-const TEMPLATES = [
-  {id:"website",label:"Website",category:"Website"},
-  {id:"email",label:"Email",category:"Pribadi"},
-  {id:"social",label:"Media Sosial",category:"Sosial Media"},
-  {id:"banking",label:"Internet Banking",category:"Bank"},
-  {id:"ewallet",label:"E-Wallet",category:"Keuangan"},
-  {id:"vps",label:"Server VPS",category:"Server"},
-  {id:"apikey",label:"API Key",category:"API"},
-  {id:"license",label:"Lisensi Software",category:"Lisensi"},
-  {id:"wifi",label:"WiFi",category:"WiFi"},
-  {id:"document",label:"Dokumen",category:"Pekerjaan"},
-  {id:"note",label:"Catatan Bebas",category:"Pribadi"},
-];
 const DEFAULT_SETTINGS = { theme:"dark", autoLockMin:5, clipboardSec:30, stealthEnabled:false, stealthPin:"", hasDecoy:false };
 const PBKDF2_ITER = 210000;
 const VERIFY_TAG = "geopass-verify-v1";
+const BUILTIN_FIELDS = [
+  {key:"website", label:"Website", type:"text", secret:false, placeholder:"https://"},
+  {key:"email", label:"Email", type:"text", secret:false},
+  {key:"username", label:"Username", type:"text", secret:false},
+  {key:"password", label:"Password", type:"text", secret:true, generator:true, mono:true},
+  {key:"pin", label:"PIN", type:"text", secret:true, mono:true},
+  {key:"notes", label:"Catatan", type:"textarea", secret:false},
+];
+const DEFAULT_VISIBLE_FIELDS = ["email","username","password"];
 
 /* ==================================================================
    Crypto helpers (Web Crypto API - AES-256-GCM + PBKDF2)
@@ -128,6 +125,29 @@ function strengthHTML(pw){
   for(let i=1;i<=4;i++) bars += `<div class="strength-bar" style="background:${i<=score?colors[score]:"var(--border)"}"></div>`;
   return `<div class="strength-bars">${bars}</div><div class="strength-label" style="color:${colors[score]||"var(--text-muted)"}">${label}</div>`;
 }
+function migrateEntry(e){
+  if(!e.customFields) e.customFields = [];
+  if(!e.visibleFields){
+    const keys = ["website","email","username","password","pin","notes"];
+    const present = keys.filter(k=>e[k]);
+    e.visibleFields = Array.from(new Set(present.concat(DEFAULT_VISIBLE_FIELDS)));
+  }
+  if(e.category===undefined || e.category===null) e.category = "";
+  return e;
+}
+function buildCopyAllText(entry){
+  const visible = entry.visibleFields||DEFAULT_VISIBLE_FIELDS;
+  const lines = [];
+  const push = (label, val) => { if(val) lines.push(`${label}: ${val}`); };
+  if(visible.indexOf("username")!==-1) push("Username", entry.username);
+  if(visible.indexOf("password")!==-1) push("Password", entry.password);
+  if(visible.indexOf("pin")!==-1) push("PIN", entry.pin);
+  if(visible.indexOf("email")!==-1) push("Email", entry.email);
+  if(visible.indexOf("website")!==-1) push("Website", entry.website);
+  (entry.customFields||[]).forEach(f=>{ if(f.value) push(f.label||"Field", f.value); });
+  if(visible.indexOf("notes")!==-1) push("Catatan", entry.notes);
+  return lines.join("\n");
+}
 
 /* ==================================================================
    Inline icons (no external font/icon dependency -> works offline)
@@ -178,7 +198,14 @@ function goStage(stage){
   } else {
     clearTimeout(idleTimer);
   }
-  if(stage==="stealth") resetCalc();
+  if(stage==="stealth"){
+    resetCalc();
+    document.getElementById("app-favicon").href = "icons/icon-calc.png";
+    document.title = "Kalkulator";
+  } else {
+    document.getElementById("app-favicon").href = "icons/icon-192.png";
+    document.title = "GeoPass Vault";
+  }
 }
 
 function applyTheme(){
@@ -228,6 +255,7 @@ async function trySlot(slot, password){
     const check = await decryptJSON(key, meta.verify.iv, meta.verify.data);
     if(check && check.check===VERIFY_TAG){
       const vault = await decryptJSON(key, meta.vault.iv, meta.vault.data);
+      vault.entries = (vault.entries||[]).map(migrateEntry);
       return {slot,key,vault};
     }
     return null;
@@ -375,13 +403,13 @@ function renderSidebar(){
   const s = State.settings, session = State.session, v = State.view;
   document.getElementById("sb-decoy-badge").classList.toggle("hidden", session.slot!=="decoy");
   document.getElementById("sb-quick").innerHTML = `
-    <button class="sb-item ${!v.filterCat&&!v.filterTag&&!v.filterFav&&!v.filterRecent?'active':''}" data-quick="all">${ic.folder()} Semua Data</button>
+    <button class="sb-item ${v.filterCat===null&&!v.filterTag&&!v.filterFav&&!v.filterRecent?'active':''}" data-quick="all">${ic.folder()} Semua Data</button>
     <button class="sb-item ${v.filterFav?'active':''}" data-quick="fav">${ic.star(v.filterFav)} Favorit</button>
     <button class="sb-item ${v.filterRecent?'active':''}" data-quick="recent">${ic.clock()} Terbaru Dibuka</button>
   `;
   document.getElementById("sb-categories").innerHTML = session.vault.categories.map(c=>
     `<button class="sb-item ${v.filterCat===c?'active':''}" data-cat="${esc(c)}"><span class="sb-dot"></span> ${esc(c)}</button>`
-  ).join("");
+  ).join("") + `<button class="sb-item ${v.filterCat===''?'active':''}" data-cat=""><span class="sb-dot" style="opacity:.4;"></span> Tanpa Kategori</button>`;
   const allTags = Array.from(new Set(session.vault.entries.reduce((a,e)=>a.concat(e.tags||[]),[])));
   document.getElementById("sb-tags-heading").classList.toggle("hidden", allTags.length===0);
   document.getElementById("sb-tags").innerHTML = allTags.map(t=>
@@ -397,11 +425,14 @@ function getFilteredEntries(){
   const v = State.view;
   let list = entries;
   if(v.filterFav) list = list.filter(e=>e.favorite);
-  if(v.filterCat) list = list.filter(e=>e.category===v.filterCat);
+  if(v.filterCat!==null) list = list.filter(e=>(e.category||"")===v.filterCat);
   if(v.filterTag) list = list.filter(e=>e.tags && e.tags.indexOf(v.filterTag)!==-1);
   if(v.searchQ.trim()){
     const q = v.searchQ.toLowerCase();
-    list = list.filter(e=>[e.title,e.username,e.email,e.website,e.notes].concat(e.tags||[]).filter(Boolean).some(f=>f.toLowerCase().indexOf(q)!==-1));
+    list = list.filter(e=>{
+      const hay = [e.title,e.username,e.email,e.website,e.notes].concat(e.tags||[]).concat((e.customFields||[]).map(f=>f.value));
+      return hay.filter(Boolean).some(f=>String(f).toLowerCase().indexOf(q)!==-1);
+    });
   }
   if(v.filterRecent){
     list = list.filter(e=>e.lastUsedAt).slice().sort((a,b)=>(b.lastUsedAt||0)-(a.lastUsedAt||0)).slice(0,20);
@@ -423,6 +454,8 @@ function renderEntryList(){
     const dup = e.password && counts[e.password]>1;
     const sub = e.username || e.email || e.website || "—";
     const tagsHtml = (e.tags&&e.tags.length) ? `<div class="card-tags">${e.tags.slice(0,3).map(t=>`<span class="chip static">${esc(t)}</span>`).join("")}</div>` : "";
+    const visible = e.visibleFields||DEFAULT_VISIBLE_FIELDS;
+    const canQuickCopy = e.password && visible.indexOf("password")!==-1;
     return `<div class="card" data-id="${e.id}" data-action="open-detail">
       <div class="card-row">
         <div style="min-width:0;flex:1;">
@@ -432,7 +465,7 @@ function renderEntryList(){
         </div>
         <div class="card-actions">
           <button class="icon-btn" data-action="toggle-fav" data-id="${e.id}" title="Favorit">${ic.star(e.favorite)}</button>
-          ${e.password?`<button class="icon-btn" data-action="quick-copy" data-id="${e.id}" title="Copy Password">${ic.copy()}</button>`:''}
+          ${canQuickCopy?`<button class="icon-btn" data-action="quick-copy" data-id="${e.id}" title="Copy Password">${ic.copy()}</button>`:''}
         </div>
       </div>
     </div>`;
@@ -465,13 +498,28 @@ function copyFieldHTML(label, field, value, secret){
   if(!value) return "";
   const displayVal = secret ? maskValue(value) : esc(value);
   return `<div class="copy-field">
-    <div class="copy-field-label">${label}</div>
+    <div class="copy-field-label">${esc(label)}</div>
     <div class="copy-field-row">
       <div class="copy-field-val" data-shown="${secret?'0':'1'}">${displayVal}</div>
       ${secret?`<button class="copy-field-btn" data-toggle-secret data-field="${field}">${ic.eye()}</button>`:''}
       <button class="copy-field-btn" data-copy data-field="${field}">${ic.copy()}</button>
     </div>
   </div>`;
+}
+function getFieldValue(entry, fieldKey){
+  if(fieldKey.indexOf("custom:")===0){
+    const cf = (entry.customFields||[]).find(c=>c.id===fieldKey.slice(7));
+    return cf ? cf.value : "";
+  }
+  return entry[fieldKey];
+}
+function getFieldLabel(entry, fieldKey){
+  if(fieldKey.indexOf("custom:")===0){
+    const cf = (entry.customFields||[]).find(c=>c.id===fieldKey.slice(7));
+    return cf ? (cf.label||"Field") : "Field";
+  }
+  const map = {website:"Website",email:"Email",username:"Username",password:"Password",pin:"PIN"};
+  return map[fieldKey]||fieldKey;
 }
 
 function renderDetail(){
@@ -480,11 +528,24 @@ function renderDetail(){
   const counts = computePasswordCounts(State.session.vault.entries);
   const dup = entry.password && counts[entry.password]>1;
   const el = document.getElementById("detail-content");
+  const visible = entry.visibleFields||DEFAULT_VISIBLE_FIELDS;
+  let fieldsHtml = "";
+  BUILTIN_FIELDS.forEach(f=>{
+    if(visible.indexOf(f.key)===-1) return;
+    if(f.key==="notes"){
+      if(entry.notes) fieldsHtml += `<div class="copy-field"><div class="copy-field-label">Catatan</div><div class="note-box">${esc(entry.notes)}</div></div>`;
+      return;
+    }
+    fieldsHtml += copyFieldHTML(f.label, f.key, entry[f.key], f.secret);
+  });
+  (entry.customFields||[]).forEach(cf=>{
+    fieldsHtml += copyFieldHTML(cf.label||"Field", "custom:"+cf.id, cf.value, cf.secret);
+  });
   el.innerHTML = `
     <div class="modal-head">
       <div>
         <div class="display-title small-title">${esc(entry.title)}</div>
-        <div class="muted tiny" style="margin-top:4px;">${esc(entry.category)}</div>
+        <div class="muted tiny" style="margin-top:4px;">${esc(entry.category)||"Tanpa Kategori"}</div>
       </div>
       <div style="display:flex;gap:4px;">
         <button class="icon-btn" id="detail-fav">${ic.star(entry.favorite)}</button>
@@ -493,12 +554,8 @@ function renderDetail(){
     </div>
     <div class="modal-body">
       ${dup?`<div class="warn-box">${ic.warn()} Password ini digunakan di lebih dari satu data</div>`:""}
-      ${copyFieldHTML("Website","website",entry.website,false)}
-      ${copyFieldHTML("Email","email",entry.email,false)}
-      ${copyFieldHTML("Username","username",entry.username,false)}
-      ${copyFieldHTML("Password","password",entry.password,true)}
-      ${copyFieldHTML("PIN","pin",entry.pin,true)}
-      ${entry.notes? `<div class="copy-field"><div class="copy-field-label">Catatan</div><div class="note-box">${esc(entry.notes)}</div></div>` : ""}
+      <button class="btn full" id="detail-copy-all" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:0;margin-bottom:14px;">${ic.copy()} Salin Semua</button>
+      ${fieldsHtml}
       ${entry.tags&&entry.tags.length? `<div class="chips" style="margin-top:12px;">${entry.tags.map(t=>`<span class="chip static">${esc(t)}</span>`).join("")}</div>`:""}
       <div class="meta-lines">
         <span>Dibuat ${timeAgo(entry.createdAt)}</span>
@@ -515,21 +572,22 @@ function renderDetail(){
   document.getElementById("detail-close").onclick = closeDetail;
   document.getElementById("detail-delete").onclick = ()=>{ if(confirm("Hapus data ini?")){ deleteEntry(entry.id); closeDetail(); } };
   document.getElementById("detail-edit").onclick = ()=>{ closeDetail(); openForm(entry); };
+  document.getElementById("detail-copy-all").onclick = ()=>{ copyToClipboard(buildCopyAllText(entry), "Semua data"); };
   el.querySelectorAll("[data-toggle-secret]").forEach(btn=>{
     btn.onclick = ()=>{
       const field = btn.getAttribute("data-field");
       const row = btn.closest(".copy-field-row");
       const valEl = row.querySelector(".copy-field-val");
       const shown = valEl.getAttribute("data-shown")==="1";
-      if(shown){ valEl.textContent = maskValue(entry[field]); valEl.setAttribute("data-shown","0"); btn.innerHTML = ic.eye(); }
-      else { valEl.textContent = entry[field]; valEl.setAttribute("data-shown","1"); btn.innerHTML = ic.eyeOff(); }
+      const val = getFieldValue(entry, field);
+      if(shown){ valEl.textContent = maskValue(val); valEl.setAttribute("data-shown","0"); btn.innerHTML = ic.eye(); }
+      else { valEl.textContent = val; valEl.setAttribute("data-shown","1"); btn.innerHTML = ic.eyeOff(); }
     };
   });
   el.querySelectorAll("[data-copy]").forEach(btn=>{
     btn.onclick = ()=>{
       const field = btn.getAttribute("data-field");
-      const labelMap = {website:"Website",email:"Email",username:"Username",password:"Password",pin:"PIN"};
-      copyToClipboard(entry[field], labelMap[field]||field);
+      copyToClipboard(getFieldValue(entry, field), getFieldLabel(entry, field));
     };
   });
 }
@@ -539,38 +597,163 @@ function renderDetail(){
    ================================================================== */
 function buildCategoryOptions(selected){
   return State.session.vault.categories.map(c=>`<option value="${esc(c)}" ${c===selected?'selected':''}>${esc(c)}</option>`).join("")
+    + `<option value="" ${selected===""?'selected':''}>Tanpa Kategori</option>`
     + `<option value="__new__">+ Tambah Kategori Baru</option>`;
 }
 function openForm(entry){
   const isNew = !entry;
-  const draft = entry ? Object.assign({}, entry, {tags:(entry.tags||[]).slice()}) : {
-    id: uid(), template:"website", category: State.session.vault.categories[0]||"Website",
+  const draft = entry ? Object.assign({}, entry, {
+    tags:(entry.tags||[]).slice(),
+    visibleFields:(entry.visibleFields||DEFAULT_VISIBLE_FIELDS).slice(),
+    customFields:(entry.customFields||[]).map(cf=>Object.assign({},cf)),
+  }) : {
+    id: uid(), category: State.session.vault.categories[0]||"",
     title:"", website:"", email:"", username:"", password:"", pin:"", notes:"",
     tags: [], favorite:false, createdAt: Date.now(), updatedAt: Date.now(), lastUsedAt:null, useCount:0,
+    visibleFields: DEFAULT_VISIBLE_FIELDS.slice(), customFields: [],
   };
   State.formDraft = draft;
   document.getElementById("form-title").textContent = isNew? "Tambah Data" : "Edit Data";
-  document.getElementById("field-template-wrap").classList.toggle("hidden", !isNew);
-  const templateSel = document.getElementById("form-template");
-  templateSel.innerHTML = TEMPLATES.map(t=>`<option value="${t.id}">${t.label}</option>`).join("");
-  templateSel.value = draft.template || "website";
   document.getElementById("form-category").innerHTML = buildCategoryOptions(draft.category);
   document.getElementById("form-titlefield").value = draft.title;
-  document.getElementById("form-website").value = draft.website||"";
-  document.getElementById("form-email").value = draft.email||"";
-  document.getElementById("form-username").value = draft.username||"";
-  document.getElementById("form-password").value = draft.password||"";
-  document.getElementById("form-pin").value = draft.pin||"";
-  document.getElementById("form-notes").value = draft.notes||"";
   document.getElementById("form-favorite").checked = !!draft.favorite;
-  document.getElementById("form-strength").innerHTML = strengthHTML(draft.password);
-  document.getElementById("form-generator").classList.add("hidden");
-  document.getElementById("form-generator").innerHTML = "";
+  renderFormFields();
+  document.getElementById("add-field-menu").classList.add("hidden");
   renderFormTags();
   document.getElementById("modal-form").classList.remove("hidden");
   setTimeout(()=>document.getElementById("form-titlefield").focus(), 50);
 }
 function closeForm(){ document.getElementById("modal-form").classList.add("hidden"); State.formDraft=null; }
+
+/* ---- dynamic field rows (builtin: removable / custom: free-form) ---- */
+function builtinFieldRowHTML(f, value){
+  const genBtn = f.generator ? `<button class="link-btn" id="form-gen-toggle">⟳ Generator</button>` : "";
+  const inputHtml = f.type==="textarea"
+    ? `<textarea class="input" data-field-input="${f.key}" rows="3">${esc(value)}</textarea>`
+    : `<input class="input ${f.mono?'mono':''}" data-field-input="${f.key}" value="${esc(value)}" placeholder="${esc(f.placeholder||'')}" ${f.secret?'type="password" autocomplete="new-password"':''}>`;
+  const strengthDiv = f.generator ? `<div id="form-strength" class="strength">${strengthHTML(value)}</div><div id="form-generator" class="generator hidden"></div>` : "";
+  return `<div class="field" data-builtin-field="${f.key}">
+    <div class="field-label-row">
+      <div class="field-label">${f.label}</div>
+      <div style="display:flex;gap:10px;align-items:center;">${genBtn}<button class="link-btn" data-remove-builtin="${f.key}" style="color:var(--danger);">✕ Hapus</button></div>
+    </div>
+    ${inputHtml}
+    ${strengthDiv}
+  </div>`;
+}
+function customFieldRowHTML(cf){
+  return `<div class="field" data-custom-field="${cf.id}">
+    <div class="field-label-row">
+      <input class="input" data-custom-label="${cf.id}" value="${esc(cf.label)}" placeholder="Nama Field" style="max-width:56%;font-size:12px;padding:6px 8px;">
+      <div style="display:flex;gap:10px;align-items:center;">
+        <label style="font-size:11px;display:flex;gap:4px;align-items:center;white-space:nowrap;"><input type="checkbox" data-custom-secret="${cf.id}" ${cf.secret?'checked':''}> Sensitif</label>
+        <button class="link-btn" data-remove-custom="${cf.id}" style="color:var(--danger);">✕</button>
+      </div>
+    </div>
+    <input class="input ${cf.secret?'mono':''}" type="${cf.secret?'password':'text'}" autocomplete="new-password" data-custom-value="${cf.id}" value="${esc(cf.value)}" placeholder="Nilai">
+  </div>`;
+}
+function renderFormFields(){
+  const draft = State.formDraft;
+  const container = document.getElementById("form-fields-container");
+  let html = "";
+  BUILTIN_FIELDS.forEach(f=>{
+    if(draft.visibleFields.indexOf(f.key)===-1) return;
+    html += builtinFieldRowHTML(f, draft[f.key]||"");
+  });
+  draft.customFields.forEach(cf=>{ html += customFieldRowHTML(cf); });
+  container.innerHTML = html;
+  container.querySelectorAll("[data-field-input]").forEach(el=>{
+    el.addEventListener("input",(e)=>{
+      const key = el.getAttribute("data-field-input");
+      draft[key] = e.target.value;
+      if(key==="password"){
+        const sEl = document.getElementById("form-strength");
+        if(sEl) sEl.innerHTML = strengthHTML(e.target.value);
+      }
+    });
+  });
+  container.querySelectorAll("[data-remove-builtin]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const key = btn.getAttribute("data-remove-builtin");
+      draft.visibleFields = draft.visibleFields.filter(k=>k!==key);
+      renderFormFields();
+    });
+  });
+  const genToggle = document.getElementById("form-gen-toggle");
+  if(genToggle){
+    genToggle.addEventListener("click",()=>{
+      const panel = document.getElementById("form-generator");
+      const willShow = panel.classList.contains("hidden");
+      panel.classList.toggle("hidden");
+      if(willShow){
+        renderGenerator(panel, (val)=>{
+          draft.password = val;
+          const inputEl = container.querySelector('[data-field-input="password"]');
+          if(inputEl) inputEl.value = val;
+          const sEl = document.getElementById("form-strength");
+          if(sEl) sEl.innerHTML = strengthHTML(val);
+          panel.classList.add("hidden");
+        });
+      }
+    });
+  }
+  container.querySelectorAll("[data-custom-label]").forEach(el=>{
+    el.addEventListener("input",(e)=>{
+      const cf = draft.customFields.find(c=>c.id===el.getAttribute("data-custom-label"));
+      if(cf) cf.label = e.target.value;
+    });
+  });
+  container.querySelectorAll("[data-custom-value]").forEach(el=>{
+    el.addEventListener("input",(e)=>{
+      const cf = draft.customFields.find(c=>c.id===el.getAttribute("data-custom-value"));
+      if(cf) cf.value = e.target.value;
+    });
+  });
+  container.querySelectorAll("[data-custom-secret]").forEach(el=>{
+    el.addEventListener("change",(e)=>{
+      const cf = draft.customFields.find(c=>c.id===el.getAttribute("data-custom-secret"));
+      if(cf){ cf.secret = e.target.checked; renderFormFields(); }
+    });
+  });
+  container.querySelectorAll("[data-remove-custom]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const id = btn.getAttribute("data-remove-custom");
+      draft.customFields = draft.customFields.filter(c=>c.id!==id);
+      renderFormFields();
+    });
+  });
+}
+function renderAddFieldMenu(){
+  const draft = State.formDraft;
+  const hidden = BUILTIN_FIELDS.filter(f=>draft.visibleFields.indexOf(f.key)===-1);
+  const menu = document.getElementById("add-field-menu");
+  let html = "";
+  if(hidden.length){
+    html += `<div class="chips">${hidden.map(f=>`<span class="chip" data-add-builtin="${f.key}" style="cursor:pointer;">+ ${f.label}</span>`).join("")}</div>`;
+  }
+  html += `<button class="btn btn-primary full" id="add-custom-field-btn" style="font-size:13px;">+ Field Custom</button>`;
+  menu.innerHTML = html;
+  menu.querySelectorAll("[data-add-builtin]").forEach(chip=>{
+    chip.addEventListener("click",()=>{
+      draft.visibleFields.push(chip.getAttribute("data-add-builtin"));
+      renderFormFields();
+      menu.classList.add("hidden");
+    });
+  });
+  document.getElementById("add-custom-field-btn").addEventListener("click",()=>{
+    draft.customFields.push({id:uid(), label:"", value:"", secret:false});
+    renderFormFields();
+    menu.classList.add("hidden");
+  });
+}
+document.getElementById("add-field-btn").addEventListener("click",()=>{
+  const menu = document.getElementById("add-field-menu");
+  const willShow = menu.classList.contains("hidden");
+  if(willShow) renderAddFieldMenu();
+  menu.classList.toggle("hidden");
+});
+
 function renderFormTags(){
   const draft = State.formDraft;
   document.getElementById("form-tags-chips").innerHTML = draft.tags.map(t=>
@@ -615,14 +798,6 @@ function renderGenerator(panel, onPick){
   draw();
 }
 
-document.getElementById("form-template").addEventListener("change",(e)=>{
-  const t = TEMPLATES.find(x=>x.id===e.target.value);
-  if(t && State.formDraft){
-    State.formDraft.template = t.id;
-    document.getElementById("form-category").value = t.category;
-    State.formDraft.category = t.category;
-  }
-});
 document.getElementById("form-category").addEventListener("change",(e)=>{
   if(!State.formDraft) return;
   if(e.target.value==="__new__"){
@@ -636,21 +811,6 @@ document.getElementById("form-category").addEventListener("change",(e)=>{
     }
   } else {
     State.formDraft.category = e.target.value;
-  }
-});
-document.getElementById("form-password").addEventListener("input",(e)=>{
-  document.getElementById("form-strength").innerHTML = strengthHTML(e.target.value);
-});
-document.getElementById("form-gen-toggle").addEventListener("click",()=>{
-  const panel = document.getElementById("form-generator");
-  const willShow = panel.classList.contains("hidden");
-  panel.classList.toggle("hidden");
-  if(willShow){
-    renderGenerator(panel, (val)=>{
-      document.getElementById("form-password").value = val;
-      document.getElementById("form-strength").innerHTML = strengthHTML(val);
-      panel.classList.add("hidden");
-    });
   }
 });
 document.getElementById("form-tag-input").addEventListener("keydown",(e)=>{
@@ -672,14 +832,9 @@ document.getElementById("form-save").addEventListener("click", ()=>{
   d.title = document.getElementById("form-titlefield").value.trim();
   if(!d.title){ document.getElementById("form-titlefield").focus(); return; }
   d.category = document.getElementById("form-category").value;
-  if(d.category==="__new__") d.category = State.session.vault.categories[0]||"Website";
-  d.website = document.getElementById("form-website").value.trim();
-  d.email = document.getElementById("form-email").value.trim();
-  d.username = document.getElementById("form-username").value.trim();
-  d.password = document.getElementById("form-password").value;
-  d.pin = document.getElementById("form-pin").value.trim();
-  d.notes = document.getElementById("form-notes").value;
+  if(d.category==="__new__") d.category = State.session.vault.categories[0]||"";
   d.favorite = document.getElementById("form-favorite").checked;
+  d.customFields = d.customFields.filter(cf=>cf.label.trim() || cf.value.trim());
   d.updatedAt = Date.now();
   saveEntry(d);
   closeForm();
@@ -703,6 +858,9 @@ function renderSettings(){
         <select class="input settings-select" id="settings-autolock">${[1,2,5,10,15,30].map(m=>`<option value="${m}" ${s.autoLockMin===m?'selected':''}>${m} menit</option>`).join("")}</select></div>
       <div class="settings-row"><div><div class="settings-row-label">Durasi Clipboard</div><div class="settings-row-sub">Hapus clipboard otomatis</div></div>
         <select class="input settings-select" id="settings-clipboard">${[15,30,45,60].map(sec=>`<option value="${sec}" ${s.clipboardSec===sec?'selected':''}>${sec} detik</option>`).join("")}</select></div>
+
+      <div class="settings-heading">Kelola Kategori</div>
+      <div id="category-manage-list"></div>
 
       <div class="settings-heading">Ubah Master Password</div>
       <input class="input" type="password" placeholder="Master Password saat ini" id="mp-old" style="margin-bottom:8px;">
@@ -733,6 +891,7 @@ function renderSettings(){
       <div class="settings-note">${ic.shieldCheck()} <span>Sidik jari/Face ID memerlukan akses sistem operasi native dan belum tersedia pada versi PWA ini &mdash; kunci layar perangkat Anda tetap melindungi akses ke aplikasi ini.</span></div>
     </div>`;
   document.getElementById("settings-close").onclick = closeSettings;
+  renderCategoryManageList();
   document.getElementById("settings-theme").onclick = ()=>{ persistSettings(Object.assign({},State.settings,{theme:State.settings.theme==="dark"?"light":"dark"})); applyTheme(); renderSettings(); };
   document.getElementById("settings-autolock").onchange = (e)=>{ persistSettings(Object.assign({},State.settings,{autoLockMin:+e.target.value})); };
   document.getElementById("settings-clipboard").onchange = (e)=>{ persistSettings(Object.assign({},State.settings,{clipboardSec:+e.target.value})); };
@@ -771,6 +930,58 @@ function renderSettings(){
   document.getElementById("settings-export").onclick = exportBackup;
   document.getElementById("settings-import-btn").onclick = ()=>document.getElementById("settings-import-file").click();
   document.getElementById("settings-import-file").onchange = (e)=>{ const f=e.target.files[0]; if(f) importBackup(f, State.session.slot); };
+}
+
+function countEntriesInCategory(name){
+  return State.session.vault.entries.filter(e=>e.category===name).length;
+}
+function deleteCategoryEntries(name){
+  State.session.vault.entries = State.session.vault.entries.filter(e=>e.category!==name);
+  State.session.vault.categories = State.session.vault.categories.filter(c=>c!==name);
+  scheduleSave(); renderEntryList(); renderSidebar(); renderCategoryManageList();
+  showToast(`Kategori "${name}" dan datanya dihapus`);
+}
+function moveCategoryEntriesToNone(name){
+  State.session.vault.entries = State.session.vault.entries.map(e=> e.category===name ? Object.assign({},e,{category:""}) : e);
+  State.session.vault.categories = State.session.vault.categories.filter(c=>c!==name);
+  scheduleSave(); renderEntryList(); renderSidebar(); renderCategoryManageList();
+  showToast(`Kategori "${name}" dihapus, data dipindah ke Tanpa Kategori`);
+}
+function renderCategoryManageList(){
+  const list = document.getElementById("category-manage-list");
+  if(!list) return;
+  const cats = State.session.vault.categories;
+  if(cats.length===0){ list.innerHTML = `<div class="settings-row-sub">Belum ada kategori.</div>`; return; }
+  list.innerHTML = cats.map(c=>{
+    const count = countEntriesInCategory(c);
+    return `<div class="cat-manage-row" data-cat-row="${esc(c)}">
+      <div class="cat-manage-info"><span class="sb-dot"></span> ${esc(c)} <span class="muted tiny">(${count})</span></div>
+      <button class="icon-btn" data-delete-cat="${esc(c)}" style="color:var(--danger);">${ic.trash()}</button>
+    </div>`;
+  }).join("");
+  list.querySelectorAll("[data-delete-cat]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const name = btn.getAttribute("data-delete-cat");
+      const count = countEntriesInCategory(name);
+      const row = list.querySelector(`[data-cat-row="${CSS.escape(name)}"]`);
+      if(count===0){
+        deleteCategoryEntries(name);
+        return;
+      }
+      row.innerHTML = `
+        <div style="width:100%;">
+          <div class="settings-row-sub" style="margin-bottom:8px;">Hapus kategori "${esc(name)}" (${count} data)?</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <button class="btn" data-move-cat="${esc(name)}" style="font-size:12px;">Pindahkan data ke "Tanpa Kategori"</button>
+            <button class="btn btn-danger" data-remove-cat="${esc(name)}" style="font-size:12px;">Hapus kategori beserta semua datanya</button>
+            <button class="btn" data-cancel-cat style="font-size:12px;background:none;">Batal</button>
+          </div>
+        </div>`;
+      row.querySelector("[data-move-cat]").onclick = ()=>moveCategoryEntriesToNone(name);
+      row.querySelector("[data-remove-cat]").onclick = ()=>{ if(confirm(`Hapus kategori "${name}" beserta ${count} data di dalamnya? Tindakan ini tidak bisa dibatalkan.`)) deleteCategoryEntries(name); };
+      row.querySelector("[data-cancel-cat]").onclick = ()=>renderCategoryManageList();
+    });
+  });
 }
 
 /* ==================================================================

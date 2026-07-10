@@ -145,6 +145,8 @@ select.input { -webkit-appearance: none; appearance: none; }
 .settings-select { padding: 6px 8px; border-radius: 6px; font-size: 12px; width: auto; }
 .settings-toggle-btn { padding: 6px 12px; border-radius: 6px; font-size: 12px; }
 .settings-note { display: flex; gap: 6px; align-items: flex-start; font-size: 11px; color: var(--text-muted); line-height: 1.6; padding: 16px 0 6px; }
+.cat-manage-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); gap: 10px; }
+.cat-manage-info { font-size: 13px; display: flex; align-items: center; gap: 8px; }
 
 .calc-wrap { max-width: 280px; margin: auto; width: 100%; padding: 24px; }
 .calc-label { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: var(--text-muted); font-size: 12px; }

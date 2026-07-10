@@ -1,4 +1,4 @@
-const CACHE_NAME = "geopass-vault-v2";
+const CACHE_NAME = "geopass-vault-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -9,6 +9,8 @@ const APP_SHELL = [
   "./icons/icon-512.png",
   "./icons/icon-192-maskable.png",
   "./icons/icon-512-maskable.png",
+  "./icons/icon-calc.png",
+  "./icons/icon-calc-192.png",
 ];
 
 self.addEventListener("install", (event) => {
