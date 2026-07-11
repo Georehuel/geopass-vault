@@ -1,4 +1,4 @@
-const CACHE_NAME = "geopass-vault-v3";
+const CACHE_NAME = "geopass-vault-v4";
 const APP_SHELL = [
   "./",
   "./index.html",

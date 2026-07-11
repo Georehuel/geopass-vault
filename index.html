@@ -19,20 +19,34 @@
 
   <!-- LOADING -->
   <div id="screen-loading" class="screen">
-    <div class="center-col"><div class="muted">Memuat...</div></div>
+    <div class="center-col"><div class="muted" data-i18n="loading">Memuat...</div></div>
   </div>
 
   <!-- STEALTH CALCULATOR -->
   <div id="screen-stealth" class="screen hidden">
     <div class="calc-wrap">
-      <div class="calc-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10"/></svg> Kalkulator</div>
+      <div class="calc-label"><span style="display:flex;align-items:center;gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10"/></svg> <span data-i18n="calculator_label">Kalkulator</span></span>
+        <button id="calc-history-btn" class="icon-btn" style="margin-left:auto;color:var(--text-muted);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button>
+      </div>
+      <div id="calc-expr" class="calc-expr"></div>
       <div id="calc-display" class="calc-display">0</div>
       <div class="calc-grid">
-        <button class="calc-btn calc-span4" data-calc="C">C</button>
+        <button class="calc-btn calc-span2" data-calc="C">C</button>
+        <button class="calc-btn calc-span2" data-calc="DEL">⌫</button>
         <button class="calc-btn" data-calc="7">7</button><button class="calc-btn" data-calc="8">8</button><button class="calc-btn" data-calc="9">9</button><button class="calc-btn" data-calc="/">÷</button>
         <button class="calc-btn" data-calc="4">4</button><button class="calc-btn" data-calc="5">5</button><button class="calc-btn" data-calc="6">6</button><button class="calc-btn" data-calc="*">×</button>
         <button class="calc-btn" data-calc="1">1</button><button class="calc-btn" data-calc="2">2</button><button class="calc-btn" data-calc="3">3</button><button class="calc-btn" data-calc="-">−</button>
         <button class="calc-btn" data-calc="0">0</button><button class="calc-btn" data-calc=".">.</button><button class="calc-btn" data-calc="=">=</button><button class="calc-btn" data-calc="+">+</button>
+      </div>
+      <div id="calc-history-panel" class="calc-history-panel hidden">
+        <div class="calc-history-head">
+          <span class="display-title tiny-title" data-i18n="history_heading">Riwayat</span>
+          <div style="display:flex;gap:12px;align-items:center;">
+            <button id="calc-history-clear" class="link-btn" data-i18n="clear_history_btn">Hapus</button>
+            <button id="calc-history-close" class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+        </div>
+        <div id="calc-history-list" class="calc-history-list gpv-scroll"></div>
       </div>
     </div>
   </div>
@@ -42,16 +56,16 @@
     <div class="vault-grid-bg"></div>
     <div class="center-col fade-in">
       <div class="badge-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6z"/></svg></div>
-      <div class="display-title">GeoPass Vault</div>
-      <div class="muted small" style="margin:6px 0 22px;">Buat Master Password untuk mengamankan vault ini. Password ini tidak dapat dipulihkan jika lupa.</div>
-      <input id="setup-pw" class="input" type="password" placeholder="Master Password" autocomplete="new-password">
+      <div class="display-title" data-i18n="app_name">GeoPass Vault</div>
+      <div class="muted small" style="margin:6px 0 22px;" data-i18n="setup_subtitle">Buat Master Password untuk mengamankan vault ini. Password ini tidak dapat dipulihkan jika lupa.</div>
+      <input id="setup-pw" class="input" type="password" placeholder="Master Password" data-i18n-placeholder="master_password_placeholder" autocomplete="new-password">
       <div id="setup-strength" class="strength"></div>
-      <input id="setup-confirm" class="input" type="password" placeholder="Konfirmasi Master Password" autocomplete="new-password" style="margin-top:12px;">
+      <input id="setup-confirm" class="input" type="password" placeholder="Konfirmasi Master Password" data-i18n-placeholder="confirm_master_password_placeholder" autocomplete="new-password" style="margin-top:12px;">
       <div id="setup-err" class="err"></div>
-      <button id="setup-submit" class="btn btn-primary full">Buat Vault</button>
-      <button id="setup-import-btn" class="btn full ghost">Pulihkan dari Backup</button>
+      <button id="setup-submit" class="btn btn-primary full" data-i18n="create_vault_btn">Buat Vault</button>
+      <button id="setup-import-btn" class="btn full ghost" data-i18n="restore_backup_btn">Pulihkan dari Backup</button>
       <input id="setup-import-file" type="file" accept=".gpvault,application/json" class="hidden">
-      <div class="muted tiny" style="margin-top:16px;">Semua data dienkripsi AES-256 dan hanya tersimpan di perangkat ini. Tidak ada server, tidak ada akun.</div>
+      <div class="muted tiny" style="margin-top:16px;" data-i18n="setup_footer_note">Semua data dienkripsi AES-256 dan hanya tersimpan di perangkat ini. Tidak ada server, tidak ada akun.</div>
     </div>
   </div>
 
@@ -61,14 +75,14 @@
     <svg class="dial" width="150" height="150" viewBox="0 0 150 150"></svg>
     <div class="center-col fade-in" style="margin-top:90px;">
       <div class="badge-icon accent-bg"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
-      <div class="display-title" style="font-size:20px;">Vault Terkunci</div>
-      <div class="muted small" style="margin:4px 0 20px;">Masukkan Master Password untuk membuka</div>
-      <input id="lock-pw" class="input center" type="password" placeholder="Master Password" autocomplete="current-password">
+      <div class="display-title" style="font-size:20px;" data-i18n="vault_locked_title">Vault Terkunci</div>
+      <div class="muted small" style="margin:4px 0 20px;" data-i18n="vault_locked_subtitle">Masukkan Master Password untuk membuka</div>
+      <input id="lock-pw" class="input center" type="password" placeholder="Master Password" data-i18n-placeholder="master_password_placeholder" autocomplete="current-password">
       <div id="lock-err" class="err"></div>
-      <button id="lock-submit" class="btn btn-primary full" style="margin-top:14px;">Buka Vault</button>
-      <button id="lock-import-btn" class="btn full ghost">Pulihkan dari Backup</button>
+      <button id="lock-submit" class="btn btn-primary full" style="margin-top:14px;" data-i18n="unlock_vault_btn">Buka Vault</button>
+      <button id="lock-import-btn" class="btn full ghost" data-i18n="restore_backup_btn">Pulihkan dari Backup</button>
       <input id="lock-import-file" type="file" accept=".gpvault,application/json" class="hidden">
-      <div class="muted tiny" style="margin-top:16px;">Tidak ada pemulihan password &mdash; jaga baik-baik.</div>
+      <div class="muted tiny" style="margin-top:16px;" data-i18n="lock_footer_note">Tidak ada pemulihan password &mdash; jaga baik-baik.</div>
     </div>
   </div>
 
@@ -77,16 +91,16 @@
     <div class="layout">
       <div id="sidebar-backdrop" class="sidebar-backdrop hidden"></div>
       <div id="sidebar" class="sidebar hidden">
-        <div class="sb-brand"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6z"/></svg><span class="display-title tiny-title">GeoPass Vault</span><button id="sidebar-close-btn" class="icon-btn sb-close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
-        <div id="sb-decoy-badge" class="decoy-badge hidden">Mode Decoy</div>
+        <div class="sb-brand"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6z"/></svg><span class="display-title tiny-title" data-i18n="app_name">GeoPass Vault</span><button id="sidebar-close-btn" class="icon-btn sb-close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+        <div id="sb-decoy-badge" class="decoy-badge hidden" data-i18n="decoy_mode_badge">Mode Decoy</div>
         <div class="sb-section" id="sb-quick"></div>
-        <div class="sb-heading">Kategori</div>
+        <div class="sb-heading" data-i18n="category_heading">Kategori</div>
         <div class="sb-section" id="sb-categories"></div>
-        <div class="sb-heading hidden" id="sb-tags-heading">Tag</div>
+        <div class="sb-heading hidden" id="sb-tags-heading" data-i18n="tag_heading">Tag</div>
         <div class="sb-tags" id="sb-tags"></div>
         <div class="sb-footer">
-          <button class="sb-btn" id="sb-settings-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Pengaturan</button>
-          <button class="sb-btn danger" id="sb-lock-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Kunci Sekarang</button>
+          <button class="sb-btn" id="sb-settings-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> <span data-i18n="settings_menu">Pengaturan</span></button>
+          <button class="sb-btn danger" id="sb-lock-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> <span data-i18n="lock_now">Kunci Sekarang</span></button>
         </div>
       </div>
       <div class="main">
@@ -94,9 +108,9 @@
           <button id="menu-btn" class="icon-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
           <div class="search-wrap">
             <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input id="search-input" class="input search" placeholder="Cari judul, username, email, tag...">
+            <input id="search-input" class="input search" placeholder="Cari judul, username, email, tag..." data-i18n-placeholder="search_placeholder">
           </div>
-          <button id="add-btn" class="btn btn-primary nowrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Tambah</button>
+          <button id="add-btn" class="btn btn-primary nowrap"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> <span data-i18n="add_btn">Tambah</span></button>
         </div>
         <div id="entry-list" class="entry-list"></div>
       </div>
@@ -117,29 +131,29 @@
       </div>
       <div class="modal-body">
         <div class="field">
-          <div class="field-label">Judul *</div>
-          <input id="form-titlefield" class="input" placeholder="mis. GitHub Kerja">
+          <div class="field-label" data-i18n="title_label">Judul *</div>
+          <input id="form-titlefield" class="input" placeholder="mis. GitHub Kerja" data-i18n-placeholder="title_placeholder">
         </div>
         <div class="field">
-          <div class="field-label">Kategori</div>
+          <div class="field-label" data-i18n="category_label">Kategori</div>
           <select id="form-category" class="input"></select>
         </div>
         <div id="form-fields-container"></div>
         <div class="field" id="add-field-wrap">
-          <button id="add-field-btn" class="btn" style="width:100%;font-size:13px;">+ Tambah Field</button>
+          <button id="add-field-btn" class="btn" style="width:100%;font-size:13px;" data-i18n="add_field_btn">+ Tambah Field</button>
           <div id="add-field-menu" class="generator hidden"></div>
         </div>
         <div class="field">
-          <div class="field-label">Tag</div>
+          <div class="field-label" data-i18n="tag_heading">Tag</div>
           <div id="form-tags-chips" class="chips"></div>
-          <input id="form-tag-input" class="input" placeholder="Tambah tag lalu Enter" style="margin-top:8px;">
+          <input id="form-tag-input" class="input" placeholder="Tambah tag lalu Enter" data-i18n-placeholder="tag_input_placeholder" style="margin-top:8px;">
           <div id="form-tag-suggest" class="chips" style="margin-top:8px;"></div>
         </div>
-        <label class="checkbox-row"><input type="checkbox" id="form-favorite"> Tandai sebagai favorit</label>
+        <label class="checkbox-row"><input type="checkbox" id="form-favorite"> <span data-i18n="mark_favorite_label">Tandai sebagai favorit</span></label>
       </div>
       <div class="modal-foot">
-        <button class="btn full" id="form-cancel">Batal</button>
-        <button class="btn btn-primary full" id="form-save">Simpan</button>
+        <button class="btn full" id="form-cancel" data-i18n="cancel_btn">Batal</button>
+        <button class="btn btn-primary full" id="form-save" data-i18n="save_btn">Simpan</button>
       </div>
     </div>
   </div>

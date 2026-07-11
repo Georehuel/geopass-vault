@@ -6,16 +6,16 @@
 const DEFAULT_CATEGORIES = ["Sosial Media","Keuangan","Pekerjaan","Pribadi"];
 const NO_CATEGORY = ""; // pseudo-category: entries with category === "" show under "Tanpa Kategori"
 const SUGGESTED_TAGS = ["Penting","Kerja","Pribadi","2FA","Lama","Baru"];
-const DEFAULT_SETTINGS = { theme:"dark", autoLockMin:5, clipboardSec:30, stealthEnabled:false, stealthPin:"", hasDecoy:false };
+const DEFAULT_SETTINGS = { theme:"dark", autoLockMin:5, clipboardSec:30, stealthEnabled:false, stealthPin:"", hasDecoy:false, lang:"id" };
 const PBKDF2_ITER = 210000;
 const VERIFY_TAG = "geopass-verify-v1";
 const BUILTIN_FIELDS = [
-  {key:"website", label:"Website", type:"text", secret:false, placeholder:"https://"},
-  {key:"email", label:"Email", type:"text", secret:false},
-  {key:"username", label:"Username", type:"text", secret:false},
-  {key:"password", label:"Password", type:"text", secret:true, generator:true, mono:true},
-  {key:"pin", label:"PIN", type:"text", secret:true, mono:true},
-  {key:"notes", label:"Catatan", type:"textarea", secret:false},
+  {key:"website", labelKey:"field_website", type:"text", secret:false, placeholder:"https://"},
+  {key:"email", labelKey:"field_email", type:"text", secret:false},
+  {key:"username", labelKey:"field_username", type:"text", secret:false},
+  {key:"password", labelKey:"field_password", type:"text", secret:true, generator:true, mono:true},
+  {key:"pin", labelKey:"field_pin", type:"text", secret:true, mono:true},
+  {key:"notes", labelKey:"field_notes", type:"textarea", secret:false},
 ];
 const DEFAULT_VISIBLE_FIELDS = ["email","username","password"];
 
@@ -99,10 +99,10 @@ function calcStrength(pw){
   if(/[0-9]/.test(pw)) charsetSize+=10;
   if(/[^a-zA-Z0-9]/.test(pw)) charsetSize+=32;
   const entropy = pw.length*Math.log2(charsetSize||1);
-  if(entropy<28) return {label:"Lemah",score:1};
-  if(entropy<45) return {label:"Sedang",score:2};
-  if(entropy<65) return {label:"Kuat",score:3};
-  return {label:"Sangat Kuat",score:4};
+  if(entropy<28) return {label:t("strength_weak"),score:1};
+  if(entropy<45) return {label:t("strength_medium"),score:2};
+  if(entropy<65) return {label:t("strength_strong"),score:3};
+  return {label:t("strength_very_strong"),score:4};
 }
 function generatePassword(opts){
   let chars="";
@@ -139,13 +139,13 @@ function buildCopyAllText(entry){
   const visible = entry.visibleFields||DEFAULT_VISIBLE_FIELDS;
   const lines = [];
   const push = (label, val) => { if(val) lines.push(`${label}: ${val}`); };
-  if(visible.indexOf("username")!==-1) push("Username", entry.username);
-  if(visible.indexOf("password")!==-1) push("Password", entry.password);
-  if(visible.indexOf("pin")!==-1) push("PIN", entry.pin);
-  if(visible.indexOf("email")!==-1) push("Email", entry.email);
-  if(visible.indexOf("website")!==-1) push("Website", entry.website);
-  (entry.customFields||[]).forEach(f=>{ if(f.value) push(f.label||"Field", f.value); });
-  if(visible.indexOf("notes")!==-1) push("Catatan", entry.notes);
+  if(visible.indexOf("username")!==-1) push(t("field_username"), entry.username);
+  if(visible.indexOf("password")!==-1) push(t("field_password"), entry.password);
+  if(visible.indexOf("pin")!==-1) push(t("field_pin"), entry.pin);
+  if(visible.indexOf("email")!==-1) push(t("field_email"), entry.email);
+  if(visible.indexOf("website")!==-1) push(t("field_website"), entry.website);
+  (entry.customFields||[]).forEach(f=>{ if(f.value) push(f.label||t("field_custom_default"), f.value); });
+  if(visible.indexOf("notes")!==-1) push(t("field_notes"), entry.notes);
   return lines.join("\n");
 }
 
@@ -169,6 +169,435 @@ const ic = {
 };
 
 /* ==================================================================
+   i18n (Bahasa Indonesia / English / 中文)
+   ================================================================== */
+const I18N = {
+  id: {
+    loading: "Memuat...",
+    setup_subtitle: "Buat Master Password untuk mengamankan vault ini. Password ini tidak dapat dipulihkan jika lupa.",
+    master_password_placeholder: "Master Password",
+    confirm_master_password_placeholder: "Konfirmasi Master Password",
+    create_vault_btn: "Buat Vault",
+    creating_vault: "Membuat Vault...",
+    restore_backup_btn: "Pulihkan dari Backup",
+    setup_footer_note: "Semua data dienkripsi AES-256 dan hanya tersimpan di perangkat ini. Tidak ada server, tidak ada akun.",
+    err_master_min: "Master Password minimal 8 karakter",
+    err_confirm_mismatch: "Konfirmasi password tidak cocok",
+    err_create_vault_failed: "Gagal membuat vault",
+    vault_locked_title: "Vault Terkunci",
+    vault_locked_subtitle: "Masukkan Master Password untuk membuka",
+    unlock_vault_btn: "Buka Vault",
+    unlocking: "Membuka...",
+    err_wrong_password: "Master Password salah",
+    lock_footer_note: "Tidak ada pemulihan password — jaga baik-baik.",
+    app_name: "GeoPass Vault",
+    decoy_mode_badge: "Mode Decoy",
+    all_data: "Semua Data",
+    favorites: "Favorit",
+    recently_opened: "Terbaru Dibuka",
+    category_heading: "Kategori",
+    tag_heading: "Tag",
+    no_category: "Tanpa Kategori",
+    settings_menu: "Pengaturan",
+    lock_now: "Kunci Sekarang",
+    search_placeholder: "Cari judul, username, email, tag...",
+    add_btn: "Tambah",
+    empty_no_data: "Belum ada data tersimpan.<br>Tekan \"Tambah\" untuk menyimpan data pertama Anda.",
+    empty_no_match: "Tidak ada data yang cocok.",
+    add_data_title: "Tambah Data",
+    edit_data_title: "Edit Data",
+    title_label: "Judul *",
+    title_placeholder: "mis. GitHub Kerja",
+    category_label: "Kategori",
+    add_field_btn: "+ Tambah Field",
+    add_custom_field_btn: "+ Field Custom",
+    field_website: "Website",
+    field_email: "Email",
+    field_username: "Username",
+    field_password: "Password",
+    field_pin: "PIN",
+    field_notes: "Catatan",
+    field_custom_default: "Field",
+    generator_toggle: "⟳ Generator",
+    remove_field_btn: "✕ Hapus",
+    custom_field_name_placeholder: "Nama Field",
+    sensitive_label: "Sensitif",
+    custom_value_placeholder: "Nilai",
+    tag_input_placeholder: "Tambah tag lalu Enter",
+    mark_favorite_label: "Tandai sebagai favorit",
+    cancel_btn: "Batal",
+    save_btn: "Simpan",
+    new_category_prompt: "Nama kategori baru:",
+    new_category_option: "+ Tambah Kategori Baru",
+    strength_weak: "Lemah",
+    strength_medium: "Sedang",
+    strength_strong: "Kuat",
+    strength_very_strong: "Sangat Kuat",
+    regenerate_btn: "↻ Acak Ulang",
+    use_btn: "Gunakan",
+    copy_all_btn: "Salin Semua",
+    reuse_warning: "Password ini digunakan di lebih dari satu data",
+    created_label: "Dibuat",
+    updated_label: "Diubah",
+    last_used_label: "Terakhir dibuka",
+    used_count_label: "digunakan",
+    delete_btn: "Hapus",
+    edit_btn: "Edit",
+    confirm_delete_entry: "Hapus data ini?",
+    toast_copied: "{label} disalin — akan dihapus dalam {sec}d",
+    toast_copy_failed: "Gagal menyalin",
+    toast_all_copied_label: "Semua data",
+    notes_label: "Catatan",
+    settings_title: "Pengaturan",
+    theme_label: "Tema",
+    theme_sub: "Terang / gelap",
+    theme_dark: "Gelap",
+    theme_light: "Terang",
+    language_label: "Bahasa",
+    language_sub: "Pilih bahasa aplikasi",
+    autolock_label: "Auto Lock",
+    autolock_sub: "Kunci otomatis saat tidak aktif",
+    minute_suffix: "menit",
+    clipboard_label: "Durasi Clipboard",
+    clipboard_sub: "Hapus clipboard otomatis",
+    second_suffix: "detik",
+    manage_categories_heading: "Kelola Kategori",
+    no_categories_yet: "Belum ada kategori.",
+    change_master_password_heading: "Ubah Master Password",
+    current_master_password_placeholder: "Master Password saat ini",
+    new_master_password_placeholder: "Master Password baru",
+    change_password_btn: "Ganti Password",
+    err_new_password_min: "Password baru minimal 8 karakter",
+    err_old_password_wrong: "Password lama salah",
+    toast_password_changed: "Master Password diubah",
+    decoy_mode_heading: "Decoy Mode",
+    decoy_active_note: "Decoy vault aktif. Password kedua membuka vault kosong/palsu.",
+    decoy_inactive_note: "Buat password kedua yang membuka vault kosong jika Anda dipaksa membuka aplikasi.",
+    create_decoy_btn: "Buat Decoy Password",
+    decoy_password_placeholder: "Decoy Master Password",
+    save_decoy_btn: "Simpan Decoy",
+    err_decoy_min: "Minimal 8 karakter",
+    err_decoy_failed: "Gagal membuat decoy",
+    toast_decoy_created: "Decoy password dibuat",
+    stealth_mode_heading: "Mode Stealth",
+    stealth_toggle_label: "Samarkan sebagai Kalkulator",
+    stealth_toggle_sub: "Buka vault lewat PIN rahasia di kalkulator",
+    stealth_pin_placeholder: "PIN rahasia (4-8 digit)",
+    stealth_pin_note: "Ketik PIN ini di kalkulator lalu tekan \"=\" untuk membuka vault.",
+    backup_restore_heading: "Backup & Restore",
+    export_btn: "Export",
+    import_btn: "Import",
+    backup_note: "File backup tetap terenkripsi. Import akan menggantikan seluruh isi vault ini.",
+    native_note: "Sidik jari/Face ID memerlukan akses sistem operasi native dan belum tersedia pada versi PWA ini — kunci layar perangkat Anda tetap melindungi akses ke aplikasi ini.",
+    toast_backup_downloaded: "Backup diunduh",
+    toast_backup_failed: "Gagal membuat backup",
+    toast_backup_restored: "Backup dipulihkan — silakan buka vault",
+    toast_backup_invalid: "File backup tidak valid",
+    delete_category_confirm: "Hapus kategori \"{name}\" ({count} data)?",
+    move_category_btn: "Pindahkan data ke \"Tanpa Kategori\"",
+    delete_category_with_data_btn: "Hapus kategori beserta semua datanya",
+    confirm_delete_category_data: "Hapus kategori \"{name}\" beserta {count} data di dalamnya? Tindakan ini tidak bisa dibatalkan.",
+    toast_category_deleted: "Kategori \"{name}\" dan datanya dihapus",
+    toast_category_moved: "Kategori \"{name}\" dihapus, data dipindah ke Tanpa Kategori",
+    copy_password_title: "Copy Password",
+    favorite_title: "Favorit",
+    toast_saved: "Data disimpan",
+    toast_deleted: "Data dihapus",
+    toast_vault_created: "Vault berhasil dibuat",
+    toast_settings_save_failed: "Gagal menyimpan pengaturan",
+    calculator_label: "Kalkulator",
+    history_heading: "Riwayat",
+    clear_history_btn: "Hapus",
+    no_history_yet: "Belum ada riwayat perhitungan",
+    native_features_heading: "Fitur Native",
+  },
+  en: {
+    loading: "Loading...",
+    setup_subtitle: "Create a Master Password to secure this vault. This password cannot be recovered if forgotten.",
+    master_password_placeholder: "Master Password",
+    confirm_master_password_placeholder: "Confirm Master Password",
+    create_vault_btn: "Create Vault",
+    creating_vault: "Creating Vault...",
+    restore_backup_btn: "Restore from Backup",
+    setup_footer_note: "All data is encrypted with AES-256 and stored only on this device. No server, no account.",
+    err_master_min: "Master Password must be at least 8 characters",
+    err_confirm_mismatch: "Password confirmation doesn't match",
+    err_create_vault_failed: "Failed to create vault",
+    vault_locked_title: "Vault Locked",
+    vault_locked_subtitle: "Enter your Master Password to unlock",
+    unlock_vault_btn: "Unlock Vault",
+    unlocking: "Unlocking...",
+    err_wrong_password: "Incorrect Master Password",
+    lock_footer_note: "There is no password recovery — keep it safe.",
+    app_name: "GeoPass Vault",
+    decoy_mode_badge: "Decoy Mode",
+    all_data: "All Data",
+    favorites: "Favorites",
+    recently_opened: "Recently Opened",
+    category_heading: "Categories",
+    tag_heading: "Tags",
+    no_category: "Uncategorized",
+    settings_menu: "Settings",
+    lock_now: "Lock Now",
+    search_placeholder: "Search title, username, email, tag...",
+    add_btn: "Add",
+    empty_no_data: "No data saved yet.<br>Tap \"Add\" to save your first entry.",
+    empty_no_match: "No matching entries.",
+    add_data_title: "Add Entry",
+    edit_data_title: "Edit Entry",
+    title_label: "Title *",
+    title_placeholder: "e.g. Work GitHub",
+    category_label: "Category",
+    add_field_btn: "+ Add Field",
+    add_custom_field_btn: "+ Custom Field",
+    field_website: "Website",
+    field_email: "Email",
+    field_username: "Username",
+    field_password: "Password",
+    field_pin: "PIN",
+    field_notes: "Notes",
+    field_custom_default: "Field",
+    generator_toggle: "⟳ Generator",
+    remove_field_btn: "✕ Remove",
+    custom_field_name_placeholder: "Field Name",
+    sensitive_label: "Sensitive",
+    custom_value_placeholder: "Value",
+    tag_input_placeholder: "Add a tag, then Enter",
+    mark_favorite_label: "Mark as favorite",
+    cancel_btn: "Cancel",
+    save_btn: "Save",
+    new_category_prompt: "New category name:",
+    new_category_option: "+ Add New Category",
+    strength_weak: "Weak",
+    strength_medium: "Medium",
+    strength_strong: "Strong",
+    strength_very_strong: "Very Strong",
+    regenerate_btn: "↻ Regenerate",
+    use_btn: "Use",
+    copy_all_btn: "Copy All",
+    reuse_warning: "This password is used in more than one entry",
+    created_label: "Created",
+    updated_label: "Updated",
+    last_used_label: "Last opened",
+    used_count_label: "used",
+    delete_btn: "Delete",
+    edit_btn: "Edit",
+    confirm_delete_entry: "Delete this entry?",
+    toast_copied: "{label} copied — will clear in {sec}s",
+    toast_copy_failed: "Failed to copy",
+    toast_all_copied_label: "All data",
+    notes_label: "Notes",
+    settings_title: "Settings",
+    theme_label: "Theme",
+    theme_sub: "Light / dark",
+    theme_dark: "Dark",
+    theme_light: "Light",
+    language_label: "Language",
+    language_sub: "Choose app language",
+    autolock_label: "Auto Lock",
+    autolock_sub: "Lock automatically when inactive",
+    minute_suffix: "min",
+    clipboard_label: "Clipboard Duration",
+    clipboard_sub: "Clear clipboard automatically",
+    second_suffix: "sec",
+    manage_categories_heading: "Manage Categories",
+    no_categories_yet: "No categories yet.",
+    change_master_password_heading: "Change Master Password",
+    current_master_password_placeholder: "Current Master Password",
+    new_master_password_placeholder: "New Master Password",
+    change_password_btn: "Change Password",
+    err_new_password_min: "New password must be at least 8 characters",
+    err_old_password_wrong: "Current password is incorrect",
+    toast_password_changed: "Master Password changed",
+    decoy_mode_heading: "Decoy Mode",
+    decoy_active_note: "Decoy vault active. The second password opens an empty/fake vault.",
+    decoy_inactive_note: "Create a second password that opens an empty vault if you're ever forced to open the app.",
+    create_decoy_btn: "Create Decoy Password",
+    decoy_password_placeholder: "Decoy Master Password",
+    save_decoy_btn: "Save Decoy",
+    err_decoy_min: "At least 8 characters",
+    err_decoy_failed: "Failed to create decoy",
+    toast_decoy_created: "Decoy password created",
+    stealth_mode_heading: "Stealth Mode",
+    stealth_toggle_label: "Disguise as Calculator",
+    stealth_toggle_sub: "Unlock the vault via a secret PIN on the calculator",
+    stealth_pin_placeholder: "Secret PIN (4-8 digits)",
+    stealth_pin_note: "Type this PIN on the calculator, then press \"=\" to unlock the vault.",
+    backup_restore_heading: "Backup & Restore",
+    export_btn: "Export",
+    import_btn: "Import",
+    backup_note: "Backup files remain encrypted. Importing will replace this vault's entire contents.",
+    native_note: "Fingerprint/Face ID requires native OS access and isn't available in this PWA version yet — your device's lock screen still protects access to this app.",
+    toast_backup_downloaded: "Backup downloaded",
+    toast_backup_failed: "Failed to create backup",
+    toast_backup_restored: "Backup restored — please unlock the vault",
+    toast_backup_invalid: "Invalid backup file",
+    delete_category_confirm: "Delete category \"{name}\" ({count} entries)?",
+    move_category_btn: "Move entries to \"Uncategorized\"",
+    delete_category_with_data_btn: "Delete category and all its entries",
+    confirm_delete_category_data: "Delete category \"{name}\" along with {count} entries inside it? This cannot be undone.",
+    toast_category_deleted: "Category \"{name}\" and its entries were deleted",
+    toast_category_moved: "Category \"{name}\" deleted, entries moved to Uncategorized",
+    copy_password_title: "Copy Password",
+    favorite_title: "Favorite",
+    toast_saved: "Entry saved",
+    toast_deleted: "Entry deleted",
+    toast_vault_created: "Vault created successfully",
+    toast_settings_save_failed: "Failed to save settings",
+    calculator_label: "Calculator",
+    history_heading: "History",
+    clear_history_btn: "Clear",
+    no_history_yet: "No calculations yet",
+    native_features_heading: "Native Features",
+  },
+  zh: {
+    loading: "加载中...",
+    setup_subtitle: "创建主密码以保护此密码库。忘记密码后将无法找回。",
+    master_password_placeholder: "主密码",
+    confirm_master_password_placeholder: "确认主密码",
+    create_vault_btn: "创建密码库",
+    creating_vault: "正在创建...",
+    restore_backup_btn: "从备份恢复",
+    setup_footer_note: "所有数据均使用 AES-256 加密，仅保存在本设备上。没有服务器，没有账户。",
+    err_master_min: "主密码至少需要 8 个字符",
+    err_confirm_mismatch: "两次输入的密码不一致",
+    err_create_vault_failed: "创建密码库失败",
+    vault_locked_title: "密码库已锁定",
+    vault_locked_subtitle: "输入主密码以解锁",
+    unlock_vault_btn: "解锁密码库",
+    unlocking: "正在解锁...",
+    err_wrong_password: "主密码错误",
+    lock_footer_note: "密码无法找回——请务必妥善保管。",
+    app_name: "GeoPass Vault",
+    decoy_mode_badge: "伪装模式",
+    all_data: "全部数据",
+    favorites: "收藏",
+    recently_opened: "最近打开",
+    category_heading: "分类",
+    tag_heading: "标签",
+    no_category: "未分类",
+    settings_menu: "设置",
+    lock_now: "立即锁定",
+    search_placeholder: "搜索标题、用户名、邮箱、标签...",
+    add_btn: "添加",
+    empty_no_data: "还没有保存任何数据。<br>点击“添加”保存第一条数据。",
+    empty_no_match: "没有匹配的数据。",
+    add_data_title: "添加数据",
+    edit_data_title: "编辑数据",
+    title_label: "标题 *",
+    title_placeholder: "例如：工作用 GitHub",
+    category_label: "分类",
+    add_field_btn: "+ 添加字段",
+    add_custom_field_btn: "+ 自定义字段",
+    field_website: "网站",
+    field_email: "邮箱",
+    field_username: "用户名",
+    field_password: "密码",
+    field_pin: "PIN 码",
+    field_notes: "备注",
+    field_custom_default: "字段",
+    generator_toggle: "⟳ 生成器",
+    remove_field_btn: "✕ 移除",
+    custom_field_name_placeholder: "字段名称",
+    sensitive_label: "敏感信息",
+    custom_value_placeholder: "内容",
+    tag_input_placeholder: "输入标签后按 Enter",
+    mark_favorite_label: "标记为收藏",
+    cancel_btn: "取消",
+    save_btn: "保存",
+    new_category_prompt: "新分类名称：",
+    new_category_option: "+ 添加新分类",
+    strength_weak: "弱",
+    strength_medium: "中等",
+    strength_strong: "强",
+    strength_very_strong: "非常强",
+    regenerate_btn: "↻ 重新生成",
+    use_btn: "使用",
+    copy_all_btn: "复制全部",
+    reuse_warning: "此密码已在多条数据中重复使用",
+    created_label: "创建于",
+    updated_label: "更新于",
+    last_used_label: "最近打开",
+    used_count_label: "已使用",
+    delete_btn: "删除",
+    edit_btn: "编辑",
+    confirm_delete_entry: "删除这条数据？",
+    toast_copied: "{label} 已复制 —— 将在 {sec} 秒后清除",
+    toast_copy_failed: "复制失败",
+    toast_all_copied_label: "全部数据",
+    notes_label: "备注",
+    settings_title: "设置",
+    theme_label: "主题",
+    theme_sub: "浅色 / 深色",
+    theme_dark: "深色",
+    theme_light: "浅色",
+    language_label: "语言",
+    language_sub: "选择应用语言",
+    autolock_label: "自动锁定",
+    autolock_sub: "闲置时自动锁定",
+    minute_suffix: "分钟",
+    clipboard_label: "剪贴板保留时长",
+    clipboard_sub: "自动清除剪贴板",
+    second_suffix: "秒",
+    manage_categories_heading: "管理分类",
+    no_categories_yet: "还没有分类。",
+    change_master_password_heading: "更改主密码",
+    current_master_password_placeholder: "当前主密码",
+    new_master_password_placeholder: "新主密码",
+    change_password_btn: "更改密码",
+    err_new_password_min: "新密码至少需要 8 个字符",
+    err_old_password_wrong: "当前密码错误",
+    toast_password_changed: "主密码已更改",
+    decoy_mode_heading: "伪装密码库",
+    decoy_active_note: "伪装密码库已启用。第二组密码将打开一个空的（伪装）密码库。",
+    decoy_inactive_note: "创建第二组密码，如果被迫打开应用时，可用它打开一个空密码库。",
+    create_decoy_btn: "创建伪装密码",
+    decoy_password_placeholder: "伪装主密码",
+    save_decoy_btn: "保存伪装密码",
+    err_decoy_min: "至少需要 8 个字符",
+    err_decoy_failed: "创建伪装密码库失败",
+    toast_decoy_created: "伪装密码已创建",
+    stealth_mode_heading: "隐藏模式",
+    stealth_toggle_label: "伪装成计算器",
+    stealth_toggle_sub: "在计算器界面输入密PIN码以解锁密码库",
+    stealth_pin_placeholder: "密PIN码（4-8位数字）",
+    stealth_pin_note: "在计算器中输入此 PIN 码后按“=”即可解锁密码库。",
+    backup_restore_heading: "备份与恢复",
+    export_btn: "导出",
+    import_btn: "导入",
+    backup_note: "备份文件仍为加密状态。导入将替换此密码库的全部内容。",
+    native_note: "指纹/面容 ID 需要系统原生权限，此 PWA 版本暂不支持——您设备本身的锁屏仍会保护此应用的访问。",
+    toast_backup_downloaded: "备份已下载",
+    toast_backup_failed: "创建备份失败",
+    toast_backup_restored: "备份已恢复——请解锁密码库",
+    toast_backup_invalid: "备份文件无效",
+    delete_category_confirm: "删除分类“{name}”（{count} 条数据）？",
+    move_category_btn: "将数据移动到“未分类”",
+    delete_category_with_data_btn: "删除分类及其全部数据",
+    confirm_delete_category_data: "删除分类“{name}”及其中 {count} 条数据？此操作无法撤销。",
+    toast_category_deleted: "分类“{name}”及其数据已删除",
+    toast_category_moved: "分类“{name}”已删除，数据已移至未分类",
+    copy_password_title: "复制密码",
+    favorite_title: "收藏",
+    toast_saved: "数据已保存",
+    toast_deleted: "数据已删除",
+    toast_vault_created: "密码库创建成功",
+    toast_settings_save_failed: "保存设置失败",
+    calculator_label: "计算器",
+    history_heading: "历史记录",
+    clear_history_btn: "清除",
+    no_history_yet: "还没有计算记录",
+    native_features_heading: "原生功能",
+  },
+};
+function t(key, vars){
+  const lang = (State.settings && State.settings.lang) || "id";
+  let str = (I18N[lang] && I18N[lang][key]) || I18N.id[key] || key;
+  if(vars){ Object.keys(vars).forEach(k=>{ str = str.replace(`{${k}}`, vars[k]); }); }
+  return str;
+}
+
+/* ==================================================================
    App state
    ================================================================== */
 const State = {
@@ -178,7 +607,7 @@ const State = {
   view: { searchQ:"", filterCat:null, filterTag:null, filterFav:false, filterRecent:false },
   detailEntryId: null,
   formDraft: null,
-  calc: { display:"0", pinBuffer:"", acc:null, op:null },
+  calc: { display:"0", pinBuffer:"", acc:null, op:null, expr:"", history:[], justEvaluated:false },
 };
 let toastTimer=null, clipboardTimer=null, idleTimer=null, saveTimer=null, autoLockBound=false;
 
@@ -201,10 +630,10 @@ function goStage(stage){
   if(stage==="stealth"){
     resetCalc();
     document.getElementById("app-favicon").href = "icons/icon-calc.png";
-    document.title = "Kalkulator";
+    document.title = t("calculator_label");
   } else {
     document.getElementById("app-favicon").href = "icons/icon-192.png";
-    document.title = "GeoPass Vault";
+    document.title = t("app_name");
   }
 }
 
@@ -227,7 +656,7 @@ function showToast(msg){
    ================================================================== */
 async function persistSettings(next){
   State.settings = next;
-  try{ await idbSet("geopass-settings", next); }catch(e){ showToast("Gagal menyimpan pengaturan"); }
+  try{ await idbSet("geopass-settings", next); }catch(e){ showToast(t("toast_settings_save_failed")); }
 }
 
 /* ==================================================================
@@ -243,7 +672,7 @@ async function handleSetup(password){
   await idbSet("geopass-real", meta);
   State.session = { slot:"real", key, vault };
   goStage("unlocked");
-  showToast("Vault berhasil dibuat");
+  showToast(t("toast_vault_created"));
 }
 
 async function trySlot(slot, password){
@@ -315,8 +744,8 @@ async function exportBackup(){
     a.href = url; a.download = `geopass-backup-${State.session.slot}-${Date.now()}.gpvault`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast("Backup diunduh");
-  }catch(e){ showToast("Gagal membuat backup"); }
+    showToast(t("toast_backup_downloaded"));
+  }catch(e){ showToast(t("toast_backup_failed")); }
 }
 function importBackup(file, slot){
   const reader = new FileReader();
@@ -325,9 +754,9 @@ function importBackup(file, slot){
       const parsed = JSON.parse(reader.result);
       if(!parsed.salt || !parsed.verify || !parsed.vault) throw new Error("invalid");
       await idbSet(`geopass-${slot||"real"}`, parsed);
-      showToast("Backup dipulihkan — silakan buka vault");
+      showToast(t("toast_backup_restored"));
       if(State.stage!=="unlocked") goStage("locked");
-    }catch(e){ showToast("File backup tidak valid"); }
+    }catch(e){ showToast(t("toast_backup_invalid")); }
   };
   reader.readAsText(file);
 }
@@ -353,12 +782,12 @@ function saveEntry(entry){
   const exists = entries.some(e=>e.id===entry.id);
   State.session.vault.entries = exists ? entries.map(e=>e.id===entry.id?entry:e) : entries.concat([entry]);
   scheduleSave(); renderEntryList(); renderSidebar();
-  showToast("Data disimpan");
+  showToast(t("toast_saved"));
 }
 function deleteEntry(id){
   State.session.vault.entries = State.session.vault.entries.filter(e=>e.id!==id);
   scheduleSave(); renderEntryList(); renderSidebar();
-  showToast("Data dihapus");
+  showToast(t("toast_deleted"));
 }
 function toggleFavorite(id){
   State.session.vault.entries = State.session.vault.entries.map(e=>e.id===id?Object.assign({},e,{favorite:!e.favorite}):e);
@@ -384,15 +813,15 @@ function computePasswordCounts(entries){
 function copyToClipboard(value, label){
   if(!value) return;
   navigator.clipboard.writeText(value).then(()=>{
-    showToast(`${label||"Teks"} disalin — akan dihapus dalam ${State.settings.clipboardSec}d`);
-  }).catch(()=>showToast("Gagal menyalin"));
+    showToast(t("toast_copied", {label: label||t("notes_label"), sec: State.settings.clipboardSec}));
+  }).catch(()=>showToast(t("toast_copy_failed")));
   clearTimeout(clipboardTimer);
   clipboardTimer = setTimeout(()=>{ navigator.clipboard.writeText("").catch(()=>{}); }, State.settings.clipboardSec*1000);
 }
 function quickCopy(id){
   const entry = State.session.vault.entries.find(e=>e.id===id);
   if(!entry) return;
-  copyToClipboard(entry.password, "Password");
+  copyToClipboard(entry.password, t("field_password"));
   recordUse(id);
 }
 
@@ -403,13 +832,13 @@ function renderSidebar(){
   const s = State.settings, session = State.session, v = State.view;
   document.getElementById("sb-decoy-badge").classList.toggle("hidden", session.slot!=="decoy");
   document.getElementById("sb-quick").innerHTML = `
-    <button class="sb-item ${v.filterCat===null&&!v.filterTag&&!v.filterFav&&!v.filterRecent?'active':''}" data-quick="all">${ic.folder()} Semua Data</button>
-    <button class="sb-item ${v.filterFav?'active':''}" data-quick="fav">${ic.star(v.filterFav)} Favorit</button>
-    <button class="sb-item ${v.filterRecent?'active':''}" data-quick="recent">${ic.clock()} Terbaru Dibuka</button>
+    <button class="sb-item ${v.filterCat===null&&!v.filterTag&&!v.filterFav&&!v.filterRecent?'active':''}" data-quick="all">${ic.folder()} ${t("all_data")}</button>
+    <button class="sb-item ${v.filterFav?'active':''}" data-quick="fav">${ic.star(v.filterFav)} ${t("favorites")}</button>
+    <button class="sb-item ${v.filterRecent?'active':''}" data-quick="recent">${ic.clock()} ${t("recently_opened")}</button>
   `;
   document.getElementById("sb-categories").innerHTML = session.vault.categories.map(c=>
     `<button class="sb-item ${v.filterCat===c?'active':''}" data-cat="${esc(c)}"><span class="sb-dot"></span> ${esc(c)}</button>`
-  ).join("") + `<button class="sb-item ${v.filterCat===''?'active':''}" data-cat=""><span class="sb-dot" style="opacity:.4;"></span> Tanpa Kategori</button>`;
+  ).join("") + `<button class="sb-item ${v.filterCat===''?'active':''}" data-cat=""><span class="sb-dot" style="opacity:.4;"></span> ${t("no_category")}</button>`;
   const allTags = Array.from(new Set(session.vault.entries.reduce((a,e)=>a.concat(e.tags||[]),[])));
   document.getElementById("sb-tags-heading").classList.toggle("hidden", allTags.length===0);
   document.getElementById("sb-tags").innerHTML = allTags.map(t=>
@@ -447,13 +876,13 @@ function renderEntryList(){
   const list = getFilteredEntries();
   const counts = computePasswordCounts(entries);
   if(list.length===0){
-    container.innerHTML = `<div class="empty-state">${entries.length===0 ? 'Belum ada data tersimpan.<br>Tekan "Tambah" untuk menyimpan data pertama Anda.' : "Tidak ada data yang cocok."}</div>`;
+    container.innerHTML = `<div class="empty-state">${entries.length===0 ? t("empty_no_data") : t("empty_no_match")}</div>`;
     return;
   }
   container.innerHTML = list.map(e=>{
     const dup = e.password && counts[e.password]>1;
     const sub = e.username || e.email || e.website || "—";
-    const tagsHtml = (e.tags&&e.tags.length) ? `<div class="card-tags">${e.tags.slice(0,3).map(t=>`<span class="chip static">${esc(t)}</span>`).join("")}</div>` : "";
+    const tagsHtml = (e.tags&&e.tags.length) ? `<div class="card-tags">${e.tags.slice(0,3).map(tg=>`<span class="chip static">${esc(tg)}</span>`).join("")}</div>` : "";
     const visible = e.visibleFields||DEFAULT_VISIBLE_FIELDS;
     const canQuickCopy = e.password && visible.indexOf("password")!==-1;
     return `<div class="card" data-id="${e.id}" data-action="open-detail">
@@ -464,8 +893,8 @@ function renderEntryList(){
           ${tagsHtml}
         </div>
         <div class="card-actions">
-          <button class="icon-btn" data-action="toggle-fav" data-id="${e.id}" title="Favorit">${ic.star(e.favorite)}</button>
-          ${canQuickCopy?`<button class="icon-btn" data-action="quick-copy" data-id="${e.id}" title="Copy Password">${ic.copy()}</button>`:''}
+          <button class="icon-btn" data-action="toggle-fav" data-id="${e.id}" title="${t("favorite_title")}">${ic.star(e.favorite)}</button>
+          ${canQuickCopy?`<button class="icon-btn" data-action="quick-copy" data-id="${e.id}" title="${t("copy_password_title")}">${ic.copy()}</button>`:''}
         </div>
       </div>
     </div>`;
@@ -516,10 +945,10 @@ function getFieldValue(entry, fieldKey){
 function getFieldLabel(entry, fieldKey){
   if(fieldKey.indexOf("custom:")===0){
     const cf = (entry.customFields||[]).find(c=>c.id===fieldKey.slice(7));
-    return cf ? (cf.label||"Field") : "Field";
+    return cf ? (cf.label||t("field_custom_default")) : t("field_custom_default");
   }
-  const map = {website:"Website",email:"Email",username:"Username",password:"Password",pin:"PIN"};
-  return map[fieldKey]||fieldKey;
+  const keyMap = {website:"field_website",email:"field_email",username:"field_username",password:"field_password",pin:"field_pin"};
+  return keyMap[fieldKey] ? t(keyMap[fieldKey]) : fieldKey;
 }
 
 function renderDetail(){
@@ -533,19 +962,19 @@ function renderDetail(){
   BUILTIN_FIELDS.forEach(f=>{
     if(visible.indexOf(f.key)===-1) return;
     if(f.key==="notes"){
-      if(entry.notes) fieldsHtml += `<div class="copy-field"><div class="copy-field-label">Catatan</div><div class="note-box">${esc(entry.notes)}</div></div>`;
+      if(entry.notes) fieldsHtml += `<div class="copy-field"><div class="copy-field-label">${t("field_notes")}</div><div class="note-box">${esc(entry.notes)}</div></div>`;
       return;
     }
-    fieldsHtml += copyFieldHTML(f.label, f.key, entry[f.key], f.secret);
+    fieldsHtml += copyFieldHTML(t(f.labelKey), f.key, entry[f.key], f.secret);
   });
   (entry.customFields||[]).forEach(cf=>{
-    fieldsHtml += copyFieldHTML(cf.label||"Field", "custom:"+cf.id, cf.value, cf.secret);
+    fieldsHtml += copyFieldHTML(cf.label||t("field_custom_default"), "custom:"+cf.id, cf.value, cf.secret);
   });
   el.innerHTML = `
     <div class="modal-head">
       <div>
         <div class="display-title small-title">${esc(entry.title)}</div>
-        <div class="muted tiny" style="margin-top:4px;">${esc(entry.category)||"Tanpa Kategori"}</div>
+        <div class="muted tiny" style="margin-top:4px;">${esc(entry.category)||t("no_category")}</div>
       </div>
       <div style="display:flex;gap:4px;">
         <button class="icon-btn" id="detail-fav">${ic.star(entry.favorite)}</button>
@@ -553,26 +982,26 @@ function renderDetail(){
       </div>
     </div>
     <div class="modal-body">
-      ${dup?`<div class="warn-box">${ic.warn()} Password ini digunakan di lebih dari satu data</div>`:""}
-      <button class="btn full" id="detail-copy-all" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:0;margin-bottom:14px;">${ic.copy()} Salin Semua</button>
+      ${dup?`<div class="warn-box">${ic.warn()} ${t("reuse_warning")}</div>`:""}
+      <button class="btn full" id="detail-copy-all" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:0;margin-bottom:14px;">${ic.copy()} ${t("copy_all_btn")}</button>
       ${fieldsHtml}
-      ${entry.tags&&entry.tags.length? `<div class="chips" style="margin-top:12px;">${entry.tags.map(t=>`<span class="chip static">${esc(t)}</span>`).join("")}</div>`:""}
+      ${entry.tags&&entry.tags.length? `<div class="chips" style="margin-top:12px;">${entry.tags.map(tg=>`<span class="chip static">${esc(tg)}</span>`).join("")}</div>`:""}
       <div class="meta-lines">
-        <span>Dibuat ${timeAgo(entry.createdAt)}</span>
-        <span>Diubah ${timeAgo(entry.updatedAt)}</span>
-        <span>Terakhir dibuka ${timeAgo(entry.lastUsedAt)} &middot; digunakan ${entry.useCount||0}x</span>
+        <span>${t("created_label")} ${timeAgo(entry.createdAt)}</span>
+        <span>${t("updated_label")} ${timeAgo(entry.updatedAt)}</span>
+        <span>${t("last_used_label")} ${timeAgo(entry.lastUsedAt)} &middot; ${t("used_count_label")} ${entry.useCount||0}x</span>
       </div>
     </div>
     <div class="modal-foot">
-      <button class="btn btn-danger" id="detail-delete" style="display:flex;align-items:center;gap:6px;">${ic.trash()} Hapus</button>
-      <button class="btn btn-primary full" id="detail-edit" style="display:flex;align-items:center;justify-content:center;gap:6px;">${ic.edit()} Edit</button>
+      <button class="btn btn-danger" id="detail-delete" style="display:flex;align-items:center;gap:6px;">${ic.trash()} ${t("delete_btn")}</button>
+      <button class="btn btn-primary full" id="detail-edit" style="display:flex;align-items:center;justify-content:center;gap:6px;">${ic.edit()} ${t("edit_btn")}</button>
     </div>
   `;
   document.getElementById("detail-fav").onclick = ()=>{ toggleFavorite(entry.id); renderDetail(); };
   document.getElementById("detail-close").onclick = closeDetail;
-  document.getElementById("detail-delete").onclick = ()=>{ if(confirm("Hapus data ini?")){ deleteEntry(entry.id); closeDetail(); } };
+  document.getElementById("detail-delete").onclick = ()=>{ if(confirm(t("confirm_delete_entry"))){ deleteEntry(entry.id); closeDetail(); } };
   document.getElementById("detail-edit").onclick = ()=>{ closeDetail(); openForm(entry); };
-  document.getElementById("detail-copy-all").onclick = ()=>{ copyToClipboard(buildCopyAllText(entry), "Semua data"); };
+  document.getElementById("detail-copy-all").onclick = ()=>{ copyToClipboard(buildCopyAllText(entry), t("toast_all_copied_label")); };
   el.querySelectorAll("[data-toggle-secret]").forEach(btn=>{
     btn.onclick = ()=>{
       const field = btn.getAttribute("data-field");
@@ -597,8 +1026,8 @@ function renderDetail(){
    ================================================================== */
 function buildCategoryOptions(selected){
   return State.session.vault.categories.map(c=>`<option value="${esc(c)}" ${c===selected?'selected':''}>${esc(c)}</option>`).join("")
-    + `<option value="" ${selected===""?'selected':''}>Tanpa Kategori</option>`
-    + `<option value="__new__">+ Tambah Kategori Baru</option>`;
+    + `<option value="" ${selected===""?'selected':''}>${t("no_category")}</option>`
+    + `<option value="__new__">${t("new_category_option")}</option>`;
 }
 function openForm(entry){
   const isNew = !entry;
@@ -613,7 +1042,7 @@ function openForm(entry){
     visibleFields: DEFAULT_VISIBLE_FIELDS.slice(), customFields: [],
   };
   State.formDraft = draft;
-  document.getElementById("form-title").textContent = isNew? "Tambah Data" : "Edit Data";
+  document.getElementById("form-title").textContent = isNew? t("add_data_title") : t("edit_data_title");
   document.getElementById("form-category").innerHTML = buildCategoryOptions(draft.category);
   document.getElementById("form-titlefield").value = draft.title;
   document.getElementById("form-favorite").checked = !!draft.favorite;
@@ -627,30 +1056,33 @@ function closeForm(){ document.getElementById("modal-form").classList.add("hidde
 
 /* ---- dynamic field rows (builtin: removable / custom: free-form) ---- */
 function builtinFieldRowHTML(f, value){
-  const genBtn = f.generator ? `<button class="link-btn" id="form-gen-toggle">⟳ Generator</button>` : "";
+  const genBtn = f.generator ? `<button class="link-btn" id="form-gen-toggle" type="button">${t("generator_toggle")}</button>` : "";
+  const eyeBtn = f.secret ? `<button class="link-btn" data-toggle-form-secret="${f.key}" type="button">${ic.eye()}</button>` : "";
   const inputHtml = f.type==="textarea"
     ? `<textarea class="input" data-field-input="${f.key}" rows="3">${esc(value)}</textarea>`
     : `<input class="input ${f.mono?'mono':''}" data-field-input="${f.key}" value="${esc(value)}" placeholder="${esc(f.placeholder||'')}" ${f.secret?'type="password" autocomplete="new-password"':''}>`;
   const strengthDiv = f.generator ? `<div id="form-strength" class="strength">${strengthHTML(value)}</div><div id="form-generator" class="generator hidden"></div>` : "";
   return `<div class="field" data-builtin-field="${f.key}">
     <div class="field-label-row">
-      <div class="field-label">${f.label}</div>
-      <div style="display:flex;gap:10px;align-items:center;">${genBtn}<button class="link-btn" data-remove-builtin="${f.key}" style="color:var(--danger);">✕ Hapus</button></div>
+      <div class="field-label">${t(f.labelKey)}</div>
+      <div style="display:flex;gap:10px;align-items:center;">${genBtn}${eyeBtn}<button class="link-btn" data-remove-builtin="${f.key}" style="color:var(--danger);" type="button">${t("remove_field_btn")}</button></div>
     </div>
     ${inputHtml}
     ${strengthDiv}
   </div>`;
 }
 function customFieldRowHTML(cf){
+  const eyeBtn = cf.secret ? `<button class="link-btn" data-toggle-custom-secret="${cf.id}" type="button">${ic.eye()}</button>` : "";
   return `<div class="field" data-custom-field="${cf.id}">
     <div class="field-label-row">
-      <input class="input" data-custom-label="${cf.id}" value="${esc(cf.label)}" placeholder="Nama Field" style="max-width:56%;font-size:12px;padding:6px 8px;">
+      <input class="input" data-custom-label="${cf.id}" value="${esc(cf.label)}" placeholder="${t("custom_field_name_placeholder")}" style="max-width:52%;font-size:12px;padding:6px 8px;">
       <div style="display:flex;gap:10px;align-items:center;">
-        <label style="font-size:11px;display:flex;gap:4px;align-items:center;white-space:nowrap;"><input type="checkbox" data-custom-secret="${cf.id}" ${cf.secret?'checked':''}> Sensitif</label>
-        <button class="link-btn" data-remove-custom="${cf.id}" style="color:var(--danger);">✕</button>
+        <label style="font-size:11px;display:flex;gap:4px;align-items:center;white-space:nowrap;"><input type="checkbox" data-custom-secret="${cf.id}" ${cf.secret?'checked':''}> ${t("sensitive_label")}</label>
+        ${eyeBtn}
+        <button class="link-btn" data-remove-custom="${cf.id}" style="color:var(--danger);" type="button">✕</button>
       </div>
     </div>
-    <input class="input ${cf.secret?'mono':''}" type="${cf.secret?'password':'text'}" autocomplete="new-password" data-custom-value="${cf.id}" value="${esc(cf.value)}" placeholder="Nilai">
+    <input class="input ${cf.secret?'mono':''}" type="${cf.secret?'password':'text'}" autocomplete="new-password" data-custom-value="${cf.id}" value="${esc(cf.value)}" placeholder="${t("custom_value_placeholder")}">
   </div>`;
 }
 function renderFormFields(){
@@ -723,6 +1155,24 @@ function renderFormFields(){
       renderFormFields();
     });
   });
+  container.querySelectorAll("[data-toggle-form-secret]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const key = btn.getAttribute("data-toggle-form-secret");
+      const input = container.querySelector(`[data-field-input="${key}"]`);
+      if(!input) return;
+      if(input.type==="password"){ input.type="text"; btn.innerHTML = ic.eyeOff(); }
+      else { input.type="password"; btn.innerHTML = ic.eye(); }
+    });
+  });
+  container.querySelectorAll("[data-toggle-custom-secret]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const id = btn.getAttribute("data-toggle-custom-secret");
+      const input = container.querySelector(`[data-custom-value="${id}"]`);
+      if(!input) return;
+      if(input.type==="password"){ input.type="text"; btn.innerHTML = ic.eyeOff(); }
+      else { input.type="password"; btn.innerHTML = ic.eye(); }
+    });
+  });
 }
 function renderAddFieldMenu(){
   const draft = State.formDraft;
@@ -730,9 +1180,9 @@ function renderAddFieldMenu(){
   const menu = document.getElementById("add-field-menu");
   let html = "";
   if(hidden.length){
-    html += `<div class="chips">${hidden.map(f=>`<span class="chip" data-add-builtin="${f.key}" style="cursor:pointer;">+ ${f.label}</span>`).join("")}</div>`;
+    html += `<div class="chips">${hidden.map(f=>`<span class="chip" data-add-builtin="${f.key}" style="cursor:pointer;">+ ${t(f.labelKey)}</span>`).join("")}</div>`;
   }
-  html += `<button class="btn btn-primary full" id="add-custom-field-btn" style="font-size:13px;">+ Field Custom</button>`;
+  html += `<button class="btn btn-primary full" id="add-custom-field-btn" style="font-size:13px;">${t("add_custom_field_btn")}</button>`;
   menu.innerHTML = html;
   menu.querySelectorAll("[data-add-builtin]").forEach(chip=>{
     chip.addEventListener("click",()=>{
@@ -756,18 +1206,18 @@ document.getElementById("add-field-btn").addEventListener("click",()=>{
 
 function renderFormTags(){
   const draft = State.formDraft;
-  document.getElementById("form-tags-chips").innerHTML = draft.tags.map(t=>
-    `<span class="chip active">${esc(t)} <span class="x" data-remove-tag="${esc(t)}">✕</span></span>`
+  document.getElementById("form-tags-chips").innerHTML = draft.tags.map(tg=>
+    `<span class="chip active">${esc(tg)} <span class="x" data-remove-tag="${esc(tg)}">✕</span></span>`
   ).join("");
-  const suggestions = SUGGESTED_TAGS.filter(t=>draft.tags.indexOf(t)===-1);
-  document.getElementById("form-tag-suggest").innerHTML = suggestions.map(t=>
-    `<span class="chip" data-add-tag="${esc(t)}">+ ${esc(t)}</span>`
+  const suggestions = SUGGESTED_TAGS.filter(tg=>draft.tags.indexOf(tg)===-1);
+  document.getElementById("form-tag-suggest").innerHTML = suggestions.map(tg=>
+    `<span class="chip" data-add-tag="${esc(tg)}">+ ${esc(tg)}</span>`
   ).join("");
 }
-function addFormTag(t){
-  t = (t||"").trim();
-  if(!t || State.formDraft.tags.indexOf(t)!==-1) return;
-  State.formDraft.tags.push(t);
+function addFormTag(tg){
+  tg = (tg||"").trim();
+  if(!tg || State.formDraft.tags.indexOf(tg)!==-1) return;
+  State.formDraft.tags.push(tg);
   renderFormTags();
 }
 function renderGenerator(panel, onPick){
@@ -784,8 +1234,8 @@ function renderGenerator(panel, onPick){
         <label><input type="checkbox" id="gen-symbols" ${opts.symbols?'checked':''}> !@#</label>
       </div>
       <div class="gen-actions">
-        <button class="btn" id="gen-regen">↻ Acak Ulang</button>
-        <button class="btn btn-primary" id="gen-use">Gunakan</button>
+        <button class="btn" id="gen-regen">${t("regenerate_btn")}</button>
+        <button class="btn btn-primary" id="gen-use">${t("use_btn")}</button>
       </div>`;
     panel.querySelector("#gen-len-slider").addEventListener("input",(e)=>{ opts.length=+e.target.value; val=generatePassword(opts); draw(); });
     panel.querySelector("#gen-upper").addEventListener("change",(e)=>{ opts.upper=e.target.checked; val=generatePassword(opts); draw(); });
@@ -801,7 +1251,7 @@ function renderGenerator(panel, onPick){
 document.getElementById("form-category").addEventListener("change",(e)=>{
   if(!State.formDraft) return;
   if(e.target.value==="__new__"){
-    const name = window.prompt("Nama kategori baru:");
+    const name = window.prompt(t("new_category_prompt"));
     if(name && name.trim()){
       addCategory(name.trim());
       e.target.innerHTML = buildCategoryOptions(name.trim());
@@ -851,48 +1301,55 @@ function renderSettings(){
   const slot = State.session.slot;
   const el = document.getElementById("settings-content");
   el.innerHTML = `
-    <div class="modal-head"><div class="display-title small-title">Pengaturan</div><button class="icon-btn" id="settings-close">${ic.close()}</button></div>
+    <div class="modal-head"><div class="display-title small-title">${t("settings_title")}</div><button class="icon-btn" id="settings-close">${ic.close()}</button></div>
     <div class="modal-body">
-      <div class="settings-row"><div><div class="settings-row-label">Tema</div><div class="settings-row-sub">Terang / gelap</div></div><button class="btn settings-toggle-btn" id="settings-theme">${s.theme==="dark"?"Gelap":"Terang"}</button></div>
-      <div class="settings-row"><div><div class="settings-row-label">Auto Lock</div><div class="settings-row-sub">Kunci otomatis saat tidak aktif</div></div>
-        <select class="input settings-select" id="settings-autolock">${[1,2,5,10,15,30].map(m=>`<option value="${m}" ${s.autoLockMin===m?'selected':''}>${m} menit</option>`).join("")}</select></div>
-      <div class="settings-row"><div><div class="settings-row-label">Durasi Clipboard</div><div class="settings-row-sub">Hapus clipboard otomatis</div></div>
-        <select class="input settings-select" id="settings-clipboard">${[15,30,45,60].map(sec=>`<option value="${sec}" ${s.clipboardSec===sec?'selected':''}>${sec} detik</option>`).join("")}</select></div>
+      <div class="settings-row"><div><div class="settings-row-label">${t("theme_label")}</div><div class="settings-row-sub">${t("theme_sub")}</div></div><button class="btn settings-toggle-btn" id="settings-theme">${s.theme==="dark"?t("theme_dark"):t("theme_light")}</button></div>
+      <div class="settings-row"><div><div class="settings-row-label">${t("language_label")}</div><div class="settings-row-sub">${t("language_sub")}</div></div>
+        <select class="input settings-select" id="settings-lang">
+          <option value="id" ${s.lang==="id"?'selected':''}>Bahasa Indonesia</option>
+          <option value="en" ${s.lang==="en"?'selected':''}>English</option>
+          <option value="zh" ${s.lang==="zh"?'selected':''}>中文</option>
+        </select></div>
+      <div class="settings-row"><div><div class="settings-row-label">${t("autolock_label")}</div><div class="settings-row-sub">${t("autolock_sub")}</div></div>
+        <select class="input settings-select" id="settings-autolock">${[1,2,5,10,15,30].map(m=>`<option value="${m}" ${s.autoLockMin===m?'selected':''}>${m} ${t("minute_suffix")}</option>`).join("")}</select></div>
+      <div class="settings-row"><div><div class="settings-row-label">${t("clipboard_label")}</div><div class="settings-row-sub">${t("clipboard_sub")}</div></div>
+        <select class="input settings-select" id="settings-clipboard">${[15,30,45,60].map(sec=>`<option value="${sec}" ${s.clipboardSec===sec?'selected':''}>${sec} ${t("second_suffix")}</option>`).join("")}</select></div>
 
-      <div class="settings-heading">Kelola Kategori</div>
+      <div class="settings-heading">${t("manage_categories_heading")}</div>
       <div id="category-manage-list"></div>
 
-      <div class="settings-heading">Ubah Master Password</div>
-      <input class="input" type="password" placeholder="Master Password saat ini" id="mp-old" style="margin-bottom:8px;">
-      <input class="input" type="password" placeholder="Master Password baru" id="mp-new">
+      <div class="settings-heading">${t("change_master_password_heading")}</div>
+      <input class="input" type="password" placeholder="${t("current_master_password_placeholder")}" id="mp-old" style="margin-bottom:8px;">
+      <input class="input" type="password" placeholder="${t("new_master_password_placeholder")}" id="mp-new">
       <div class="err" id="mp-err"></div>
-      <button class="btn full" id="mp-submit">Ganti Password</button>
+      <button class="btn full" id="mp-submit">${t("change_password_btn")}</button>
 
-      <div class="settings-heading">Decoy Mode</div>
-      <div class="settings-row-sub" style="margin-bottom:10px;">${(s.hasDecoy||slot==="decoy") ? "Decoy vault aktif. Password kedua membuka vault kosong/palsu." : "Buat password kedua yang membuka vault kosong jika Anda dipaksa membuka aplikasi."}</div>
-      <div id="decoy-area">${(slot!=="decoy" && !s.hasDecoy) ? `<button class="btn full" id="decoy-open-btn">Buat Decoy Password</button>` : ""}</div>
+      <div class="settings-heading">${t("decoy_mode_heading")}</div>
+      <div class="settings-row-sub" style="margin-bottom:10px;">${(s.hasDecoy||slot==="decoy") ? t("decoy_active_note") : t("decoy_inactive_note")}</div>
+      <div id="decoy-area">${(slot!=="decoy" && !s.hasDecoy) ? `<button class="btn full" id="decoy-open-btn">${t("create_decoy_btn")}</button>` : ""}</div>
 
-      <div class="settings-heading">Mode Stealth</div>
-      <div class="settings-row"><div><div class="settings-row-label">Samarkan sebagai Kalkulator</div><div class="settings-row-sub">Buka vault lewat PIN rahasia di kalkulator</div></div>
+      <div class="settings-heading">${t("stealth_mode_heading")}</div>
+      <div class="settings-row"><div><div class="settings-row-label">${t("stealth_toggle_label")}</div><div class="settings-row-sub">${t("stealth_toggle_sub")}</div></div>
         <input type="checkbox" id="settings-stealth" ${s.stealthEnabled?'checked':''}></div>
       <div id="stealth-pin-area" class="${s.stealthEnabled?'':'hidden'}" style="margin-bottom:14px;">
-        <input class="input mono" placeholder="PIN rahasia (4-8 digit)" id="settings-stealth-pin" value="${esc(s.stealthPin)}">
-        <div class="settings-row-sub">Ketik PIN ini di kalkulator lalu tekan &quot;=&quot; untuk membuka vault.</div>
+        <input class="input mono" placeholder="${t("stealth_pin_placeholder")}" id="settings-stealth-pin" value="${esc(s.stealthPin)}">
+        <div class="settings-row-sub">${t("stealth_pin_note")}</div>
       </div>
 
-      <div class="settings-heading">Backup &amp; Restore</div>
+      <div class="settings-heading">${t("backup_restore_heading")}</div>
       <div style="display:flex;gap:8px;margin-bottom:4px;">
-        <button class="btn" id="settings-export" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;">${ic.download()} Export</button>
-        <button class="btn" id="settings-import-btn" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;">${ic.upload()} Import</button>
+        <button class="btn" id="settings-export" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;">${ic.download()} ${t("export_btn")}</button>
+        <button class="btn" id="settings-import-btn" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;">${ic.upload()} ${t("import_btn")}</button>
       </div>
-      <div class="settings-row-sub" style="margin-bottom:14px;">File backup tetap terenkripsi. Import akan menggantikan seluruh isi vault ini.</div>
+      <div class="settings-row-sub" style="margin-bottom:14px;">${t("backup_note")}</div>
       <input type="file" id="settings-import-file" accept=".gpvault,application/json" class="hidden">
 
-      <div class="settings-note">${ic.shieldCheck()} <span>Sidik jari/Face ID memerlukan akses sistem operasi native dan belum tersedia pada versi PWA ini &mdash; kunci layar perangkat Anda tetap melindungi akses ke aplikasi ini.</span></div>
+      <div class="settings-note">${ic.shieldCheck()} <span>${t("native_note")}</span></div>
     </div>`;
   document.getElementById("settings-close").onclick = closeSettings;
   renderCategoryManageList();
   document.getElementById("settings-theme").onclick = ()=>{ persistSettings(Object.assign({},State.settings,{theme:State.settings.theme==="dark"?"light":"dark"})); applyTheme(); renderSettings(); };
+  document.getElementById("settings-lang").onchange = (e)=>{ persistSettings(Object.assign({},State.settings,{lang:e.target.value})); refreshUILanguage(); };
   document.getElementById("settings-autolock").onchange = (e)=>{ persistSettings(Object.assign({},State.settings,{autoLockMin:+e.target.value})); };
   document.getElementById("settings-clipboard").onchange = (e)=>{ persistSettings(Object.assign({},State.settings,{clipboardSec:+e.target.value})); };
   document.getElementById("mp-submit").onclick = async ()=>{
@@ -900,24 +1357,24 @@ function renderSettings(){
     const newPw = document.getElementById("mp-new").value;
     const errEl = document.getElementById("mp-err");
     errEl.textContent="";
-    if(newPw.length<8){ errEl.textContent="Password baru minimal 8 karakter"; return; }
+    if(newPw.length<8){ errEl.textContent=t("err_new_password_min"); return; }
     const ok = await changeMasterPassword(oldPw,newPw);
-    if(!ok) errEl.textContent="Password lama salah";
-    else { document.getElementById("mp-old").value=""; document.getElementById("mp-new").value=""; showToast("Master Password diubah"); }
+    if(!ok) errEl.textContent=t("err_old_password_wrong");
+    else { document.getElementById("mp-old").value=""; document.getElementById("mp-new").value=""; showToast(t("toast_password_changed")); }
   };
   const decoyOpenBtn = document.getElementById("decoy-open-btn");
   if(decoyOpenBtn){
     decoyOpenBtn.onclick = ()=>{
       document.getElementById("decoy-area").innerHTML = `
-        <input class="input" type="password" placeholder="Decoy Master Password" id="decoy-pw">
+        <input class="input" type="password" placeholder="${t("decoy_password_placeholder")}" id="decoy-pw">
         <div class="err" id="decoy-err"></div>
-        <button class="btn btn-primary full" id="decoy-submit">Simpan Decoy</button>`;
+        <button class="btn btn-primary full" id="decoy-submit">${t("save_decoy_btn")}</button>`;
       document.getElementById("decoy-submit").onclick = async ()=>{
         const pw = document.getElementById("decoy-pw").value;
         const errEl = document.getElementById("decoy-err");
-        if(pw.length<8){ errEl.textContent="Minimal 8 karakter"; return; }
-        try{ await setupDecoy(pw); renderSettings(); showToast("Decoy password dibuat"); }
-        catch(e){ errEl.textContent="Gagal membuat decoy"; }
+        if(pw.length<8){ errEl.textContent=t("err_decoy_min"); return; }
+        try{ await setupDecoy(pw); renderSettings(); showToast(t("toast_decoy_created")); }
+        catch(e){ errEl.textContent=t("err_decoy_failed"); }
       };
     };
   }
@@ -939,19 +1396,19 @@ function deleteCategoryEntries(name){
   State.session.vault.entries = State.session.vault.entries.filter(e=>e.category!==name);
   State.session.vault.categories = State.session.vault.categories.filter(c=>c!==name);
   scheduleSave(); renderEntryList(); renderSidebar(); renderCategoryManageList();
-  showToast(`Kategori "${name}" dan datanya dihapus`);
+  showToast(t("toast_category_deleted", {name}));
 }
 function moveCategoryEntriesToNone(name){
   State.session.vault.entries = State.session.vault.entries.map(e=> e.category===name ? Object.assign({},e,{category:""}) : e);
   State.session.vault.categories = State.session.vault.categories.filter(c=>c!==name);
   scheduleSave(); renderEntryList(); renderSidebar(); renderCategoryManageList();
-  showToast(`Kategori "${name}" dihapus, data dipindah ke Tanpa Kategori`);
+  showToast(t("toast_category_moved", {name}));
 }
 function renderCategoryManageList(){
   const list = document.getElementById("category-manage-list");
   if(!list) return;
   const cats = State.session.vault.categories;
-  if(cats.length===0){ list.innerHTML = `<div class="settings-row-sub">Belum ada kategori.</div>`; return; }
+  if(cats.length===0){ list.innerHTML = `<div class="settings-row-sub">${t("no_categories_yet")}</div>`; return; }
   list.innerHTML = cats.map(c=>{
     const count = countEntriesInCategory(c);
     return `<div class="cat-manage-row" data-cat-row="${esc(c)}">
@@ -970,15 +1427,15 @@ function renderCategoryManageList(){
       }
       row.innerHTML = `
         <div style="width:100%;">
-          <div class="settings-row-sub" style="margin-bottom:8px;">Hapus kategori "${esc(name)}" (${count} data)?</div>
+          <div class="settings-row-sub" style="margin-bottom:8px;">${t("delete_category_confirm",{name,count})}</div>
           <div style="display:flex;flex-direction:column;gap:6px;">
-            <button class="btn" data-move-cat="${esc(name)}" style="font-size:12px;">Pindahkan data ke "Tanpa Kategori"</button>
-            <button class="btn btn-danger" data-remove-cat="${esc(name)}" style="font-size:12px;">Hapus kategori beserta semua datanya</button>
-            <button class="btn" data-cancel-cat style="font-size:12px;background:none;">Batal</button>
+            <button class="btn" data-move-cat="${esc(name)}" style="font-size:12px;">${t("move_category_btn")}</button>
+            <button class="btn btn-danger" data-remove-cat="${esc(name)}" style="font-size:12px;">${t("delete_category_with_data_btn")}</button>
+            <button class="btn" data-cancel-cat style="font-size:12px;background:none;">${t("cancel_btn")}</button>
           </div>
         </div>`;
       row.querySelector("[data-move-cat]").onclick = ()=>moveCategoryEntriesToNone(name);
-      row.querySelector("[data-remove-cat]").onclick = ()=>{ if(confirm(`Hapus kategori "${name}" beserta ${count} data di dalamnya? Tindakan ini tidak bisa dibatalkan.`)) deleteCategoryEntries(name); };
+      row.querySelector("[data-remove-cat]").onclick = ()=>{ if(confirm(t("confirm_delete_category_data",{name,count}))) deleteCategoryEntries(name); };
       row.querySelector("[data-cancel-cat]").onclick = ()=>renderCategoryManageList();
     });
   });
@@ -1011,16 +1468,36 @@ window.addEventListener("keydown",(e)=>{
 /* ==================================================================
    Stealth calculator
    ================================================================== */
+function fmtNum(n){
+  if(!isFinite(n)) return "Error";
+  const rounded = Math.round(n*1e10)/1e10;
+  return String(rounded);
+}
+function opSymbol(op){ return {"+":"+","-":"−","*":"×","/":"÷"}[op] || op; }
 function resetCalc(){
-  State.calc = {display:"0", pinBuffer:"", acc:null, op:null};
-  const d = document.getElementById("calc-display");
-  if(d) d.textContent = "0";
+  State.calc.display = "0"; State.calc.pinBuffer=""; State.calc.acc=null; State.calc.op=null; State.calc.expr=""; State.calc.justEvaluated=false;
+  const d = document.getElementById("calc-display"); if(d) d.textContent = "0";
+  const ex = document.getElementById("calc-expr"); if(ex) ex.textContent = "";
+  const panel = document.getElementById("calc-history-panel"); if(panel) panel.classList.add("hidden");
 }
 function exitStealth(){ goStage(State.session ? "unlocked" : "locked"); }
+function renderCalcHistory(){
+  const list = document.getElementById("calc-history-list");
+  if(!list) return;
+  if(!State.calc.history.length){ list.innerHTML = `<div class="muted tiny" style="padding:20px 4px;text-align:center;">${t("no_history_yet")}</div>`; return; }
+  list.innerHTML = State.calc.history.map(h=>`<div class="calc-history-item">${esc(h)}</div>`).join("");
+}
 function handleCalcKey(k){
   const c = State.calc;
   const disp = document.getElementById("calc-display");
+  const exprEl = document.getElementById("calc-expr");
   if(k==="C"){ resetCalc(); return; }
+  if(k==="DEL"){
+    c.display = c.display.length>1 ? c.display.slice(0,-1) : "0";
+    c.pinBuffer = c.pinBuffer.slice(0,-1);
+    disp.textContent = c.display;
+    return;
+  }
   if(k==="="){
     if(c.pinBuffer && State.settings.stealthPin && c.pinBuffer.indexOf(State.settings.stealthPin)!==-1){
       resetCalc(); exitStealth(); return;
@@ -1031,29 +1508,61 @@ function handleCalcKey(k){
       if(c.op==="+") res = c.acc+cur;
       if(c.op==="-") res = c.acc-cur;
       if(c.op==="*") res = c.acc*cur;
-      if(c.op==="/") res = cur!==0? c.acc/cur : 0;
-      c.display = String(res);
+      if(c.op==="/") res = cur!==0? c.acc/cur : NaN;
+      const resStr = fmtNum(res);
+      c.history.unshift(`${fmtNum(c.acc)} ${opSymbol(c.op)} ${fmtNum(cur)} = ${resStr}`);
+      if(c.history.length>50) c.history.pop();
+      c.display = resStr;
+      exprEl.textContent = "";
     }
-    c.acc=null; c.op=null; c.pinBuffer="";
+    c.acc=null; c.op=null; c.pinBuffer=""; c.justEvaluated=true;
     disp.textContent = c.display;
     return;
   }
   if(k==="+"||k==="-"||k==="*"||k==="/"){
-    c.acc = parseFloat(c.display); c.op = k; c.display = "0";
+    if(c.display==="Error"){ resetCalc(); }
+    c.justEvaluated=false;
+    if(c.acc!==null && c.op){
+      const cur = parseFloat(c.display);
+      let res = cur;
+      if(c.op==="+") res=c.acc+cur;
+      if(c.op==="-") res=c.acc-cur;
+      if(c.op==="*") res=c.acc*cur;
+      if(c.op==="/") res=cur!==0?c.acc/cur:NaN;
+      c.acc = res;
+    } else {
+      c.acc = parseFloat(c.display);
+    }
+    c.op = k;
+    c.display = "0";
+    exprEl.textContent = `${fmtNum(c.acc)} ${opSymbol(k)}`;
     disp.textContent = c.display;
     return;
   }
   if(k==="."){
+    if(c.justEvaluated){ c.display="0"; c.justEvaluated=false; }
     if(c.display.indexOf(".")===-1) c.display += ".";
     disp.textContent = c.display;
     return;
   }
+  if(c.justEvaluated){ c.display="0"; c.justEvaluated=false; }
   c.pinBuffer = (c.pinBuffer + k).slice(-12);
-  c.display = c.display==="0" ? k : c.display+k;
+  c.display = (c.display==="0"||c.display==="Error") ? k : c.display+k;
   disp.textContent = c.display;
 }
 document.querySelectorAll("[data-calc]").forEach(btn=>{
   btn.addEventListener("click", ()=>handleCalcKey(btn.getAttribute("data-calc")));
+});
+document.getElementById("calc-history-btn").addEventListener("click", ()=>{
+  renderCalcHistory();
+  document.getElementById("calc-history-panel").classList.remove("hidden");
+});
+document.getElementById("calc-history-close").addEventListener("click", ()=>{
+  document.getElementById("calc-history-panel").classList.add("hidden");
+});
+document.getElementById("calc-history-clear").addEventListener("click", ()=>{
+  State.calc.history = [];
+  renderCalcHistory();
 });
 
 /* ==================================================================
@@ -1120,12 +1629,12 @@ document.getElementById("setup-submit").addEventListener("click", async ()=>{
   const confirmPw = document.getElementById("setup-confirm").value;
   const errEl = document.getElementById("setup-err");
   errEl.textContent="";
-  if(pw.length<8){ errEl.textContent="Master Password minimal 8 karakter"; return; }
-  if(pw!==confirmPw){ errEl.textContent="Konfirmasi password tidak cocok"; return; }
+  if(pw.length<8){ errEl.textContent=t("err_master_min"); return; }
+  if(pw!==confirmPw){ errEl.textContent=t("err_confirm_mismatch"); return; }
   const btn = document.getElementById("setup-submit");
-  btn.disabled=true; btn.textContent="Membuat Vault...";
+  btn.disabled=true; btn.textContent=t("creating_vault");
   try{ await handleSetup(pw); }
-  catch(e){ errEl.textContent="Gagal membuat vault"; btn.disabled=false; btn.textContent="Buat Vault"; }
+  catch(e){ errEl.textContent=t("err_create_vault_failed"); btn.disabled=false; btn.textContent=t("create_vault_btn"); }
 });
 document.getElementById("setup-import-btn").addEventListener("click", ()=>document.getElementById("setup-import-file").click());
 document.getElementById("setup-import-file").addEventListener("change",(e)=>{ const f=e.target.files[0]; if(f) importBackup(f,"real"); });
@@ -1141,7 +1650,7 @@ async function doUnlock(){
   const ok = await handleUnlock(pw);
   btn.disabled=false;
   document.getElementById("lock-pw").value="";
-  if(!ok) errEl.textContent="Master Password salah";
+  if(!ok) errEl.textContent=t("err_wrong_password");
 }
 document.getElementById("lock-submit").addEventListener("click", doUnlock);
 document.getElementById("lock-pw").addEventListener("keydown",(e)=>{ if(e.key==="Enter") doUnlock(); });
@@ -1166,6 +1675,35 @@ function drawDial(){
 }
 
 /* ==================================================================
+   i18n application (static HTML text + live re-render of dynamic views)
+   ================================================================== */
+function applyStaticI18n(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const key = el.getAttribute("data-i18n");
+    el.innerHTML = t(key);
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
+    const key = el.getAttribute("data-i18n-placeholder");
+    el.placeholder = t(key);
+  });
+  document.title = State.stage==="stealth" ? t("calculator_label") : t("app_name");
+}
+function refreshUILanguage(){
+  applyStaticI18n();
+  if(State.stage==="unlocked" && State.session){
+    renderSidebar();
+    renderEntryList();
+    if(State.detailEntryId) renderDetail();
+    if(!document.getElementById("modal-form").classList.contains("hidden") && State.formDraft){
+      renderFormFields();
+    }
+    if(!document.getElementById("modal-settings").classList.contains("hidden")){
+      renderSettings();
+    }
+  }
+}
+
+/* ==================================================================
    Bootstrap
    ================================================================== */
 async function init(){
@@ -1174,6 +1712,7 @@ async function init(){
   try{ const s = await idbGet("geopass-settings"); if(s) loaded = Object.assign({}, DEFAULT_SETTINGS, s); }catch(e){ /* first run */ }
   State.settings = loaded;
   applyTheme();
+  applyStaticI18n();
   let hasReal=false;
   try{ const r = await idbGet("geopass-real"); hasReal=!!r; }catch(e){ hasReal=false; }
   if(loaded.stealthEnabled) goStage("stealth");
