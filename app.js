@@ -244,6 +244,7 @@ const I18N = {
     delete_btn: "Hapus",
     edit_btn: "Edit",
     confirm_delete_entry: "Hapus data ini?",
+    undo_btn: "Urungkan",
     toast_copied: "{label} disalin — akan dihapus dalam {sec}d",
     toast_copy_failed: "Gagal menyalin",
     toast_all_copied_label: "Semua data",
@@ -383,6 +384,7 @@ const I18N = {
     delete_btn: "Delete",
     edit_btn: "Edit",
     confirm_delete_entry: "Delete this entry?",
+    undo_btn: "Undo",
     toast_copied: "{label} copied — will clear in {sec}s",
     toast_copy_failed: "Failed to copy",
     toast_all_copied_label: "All data",
@@ -522,6 +524,7 @@ const I18N = {
     delete_btn: "删除",
     edit_btn: "编辑",
     confirm_delete_entry: "删除这条数据？",
+    undo_btn: "撤销",
     toast_copied: "{label} 已复制 —— 将在 {sec} 秒后清除",
     toast_copy_failed: "复制失败",
     toast_all_copied_label: "全部数据",
@@ -617,7 +620,13 @@ let toastTimer=null, clipboardTimer=null, idleTimer=null, saveTimer=null, autoLo
 function goStage(stage){
   State.stage = stage;
   ["loading","stealth","setup","locked","unlocked"].forEach(s=>{
-    document.getElementById("screen-"+s).classList.toggle("hidden", s!==stage);
+    const el = document.getElementById("screen-"+s);
+    el.classList.toggle("hidden", s!==stage);
+    if(s===stage){
+      el.classList.remove("screen-enter");
+      void el.offsetWidth; // force reflow so the animation re-triggers every time
+      el.classList.add("screen-enter");
+    }
   });
   if(stage==="unlocked"){
     openSidebarPanel();
@@ -644,11 +653,31 @@ function applyTheme(){
 }
 
 function showToast(msg){
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.remove("hidden");
+  const toastEl = document.getElementById("toast");
+  toastEl.classList.remove("hiding");
+  toastEl.textContent = msg;
+  toastEl.classList.remove("hidden");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>t.classList.add("hidden"), 2200);
+  toastTimer = setTimeout(()=>dismissToast(), 2200);
+}
+function dismissToast(){
+  const toastEl = document.getElementById("toast");
+  if(toastEl.classList.contains("hidden")) return;
+  toastEl.classList.add("hiding");
+  setTimeout(()=>{ toastEl.classList.add("hidden"); toastEl.classList.remove("hiding"); }, 160);
+}
+function showUndoToast(msg, onUndo){
+  const toastEl = document.getElementById("toast");
+  toastEl.classList.remove("hiding");
+  toastEl.innerHTML = `<span>${esc(msg)}</span><button id="toast-undo-btn" class="toast-undo-btn">${t("undo_btn")}</button>`;
+  toastEl.classList.remove("hidden");
+  document.getElementById("toast-undo-btn").onclick = ()=>{
+    clearTimeout(toastTimer);
+    dismissToast();
+    onUndo();
+  };
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>dismissToast(), 5000);
 }
 
 /* ==================================================================
@@ -787,7 +816,24 @@ function saveEntry(entry){
 function deleteEntry(id){
   State.session.vault.entries = State.session.vault.entries.filter(e=>e.id!==id);
   scheduleSave(); renderEntryList(); renderSidebar();
-  showToast(t("toast_deleted"));
+}
+function deleteEntryWithUndo(id){
+  const entry = State.session.vault.entries.find(e=>e.id===id);
+  if(!entry) return;
+  const cardEl = document.querySelector(`.card[data-id="${id}"]`);
+  const commit = ()=>{
+    deleteEntry(id);
+    showUndoToast(t("toast_deleted"), ()=>{
+      State.session.vault.entries = State.session.vault.entries.concat([entry]);
+      scheduleSave(); renderEntryList(); renderSidebar();
+    });
+  };
+  if(cardEl){
+    cardEl.classList.add("removing");
+    setTimeout(commit, 260);
+  } else {
+    commit();
+  }
 }
 function toggleFavorite(id){
   State.session.vault.entries = State.session.vault.entries.map(e=>e.id===id?Object.assign({},e,{favorite:!e.favorite}):e);
@@ -905,10 +951,21 @@ document.getElementById("entry-list").addEventListener("click",(e)=>{
   if(!btn) return;
   const id = btn.getAttribute("data-id");
   const action = btn.getAttribute("data-action");
-  if(action==="toggle-fav") toggleFavorite(id);
+  if(action==="toggle-fav"){
+    const entry = State.session.vault.entries.find(en=>en.id===id);
+    const nowFav = entry ? !entry.favorite : false;
+    btn.innerHTML = ic.star(nowFav);
+    pulseIcon(btn);
+    setTimeout(()=>toggleFavorite(id), 260);
+  }
   else if(action==="quick-copy") quickCopy(id);
   else if(action==="open-detail") openDetail(id);
 });
+function pulseIcon(el){
+  el.classList.remove("pulse");
+  void el.offsetWidth;
+  el.classList.add("pulse");
+}
 
 /* ==================================================================
    Entry detail modal
@@ -997,9 +1054,14 @@ function renderDetail(){
       <button class="btn btn-primary full" id="detail-edit" style="display:flex;align-items:center;justify-content:center;gap:6px;">${ic.edit()} ${t("edit_btn")}</button>
     </div>
   `;
-  document.getElementById("detail-fav").onclick = ()=>{ toggleFavorite(entry.id); renderDetail(); };
+  document.getElementById("detail-fav").onclick = (e)=>{
+    const btn = e.currentTarget;
+    btn.innerHTML = ic.star(!entry.favorite);
+    pulseIcon(btn);
+    setTimeout(()=>{ toggleFavorite(entry.id); renderDetail(); }, 260);
+  };
   document.getElementById("detail-close").onclick = closeDetail;
-  document.getElementById("detail-delete").onclick = ()=>{ if(confirm(t("confirm_delete_entry"))){ deleteEntry(entry.id); closeDetail(); } };
+  document.getElementById("detail-delete").onclick = ()=>{ closeDetail(); deleteEntryWithUndo(entry.id); };
   document.getElementById("detail-edit").onclick = ()=>{ closeDetail(); openForm(entry); };
   document.getElementById("detail-copy-all").onclick = ()=>{ copyToClipboard(buildCopyAllText(entry), t("toast_all_copied_label")); };
   el.querySelectorAll("[data-toggle-secret]").forEach(btn=>{

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GeoPass Vault — Password Manager Pribadi, Offline &amp; Terenkripsi</title>
+<meta name="description" content="Vault password pribadi yang sepenuhnya offline. AES-256, tanpa server, tanpa akun. Data Anda hanya ada di perangkat Anda.">
+<link rel="icon" href="icons/icon-192.png">
+<style>
+:root{
+  --bg:#15181B; --surface:#1C2024; --surface2:#23282D; --border:#2C3238;
+  --text:#EAE7E1; --text-muted:#8D949B; --accent:#C4995F; --accent-soft:rgba(196,153,95,0.14);
+  --accent-strong:#D9AD73; --success:#74A98B;
+  --font-display: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Menlo', 'Consolas', monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font-body);}
+body{overflow-x:hidden;}
+a{color:inherit;}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+.vault-grid-bg{position:fixed;inset:0;z-index:-1;opacity:0.28;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:32px 32px;}
+
+/* Header */
+header{position:sticky;top:0;z-index:20;background:rgba(21,24,27,0.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 0;}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700;font-size:16px;}
+.brand img{width:30px;height:30px;border-radius:8px;}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);padding:11px 20px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .15s ease;}
+.btn:hover{border-color:var(--accent);color:var(--accent-strong);}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#1B1508;}
+.btn-primary:hover{background:var(--accent-strong);border-color:var(--accent-strong);color:#1B1508;}
+.btn-sm{padding:9px 16px;font-size:13px;}
+
+/* Hero */
+.hero{padding:76px 0 40px;display:flex;align-items:center;gap:56px;flex-wrap:wrap;}
+.hero-copy{flex:1 1 420px;min-width:300px;}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent);padding:6px 12px;border-radius:20px;font-family:var(--font-mono);margin-bottom:20px;}
+h1{font-family:var(--font-display);font-size:44px;line-height:1.12;margin:0 0 18px;letter-spacing:-0.02em;}
+h1 span{color:var(--accent);}
+.hero-sub{font-size:17px;color:var(--text-muted);line-height:1.6;margin:0 0 30px;max-width:480px;}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px;}
+.hero-note{font-size:12.5px;color:var(--text-muted);display:flex;align-items:center;gap:8px;}
+.hero-note svg{flex-shrink:0;color:var(--accent);}
+.hero-shot{flex:1 1 300px;min-width:260px;max-width:340px;display:flex;justify-content:center;}
+.hero-shot img{width:100%;max-width:300px;border-radius:22px;border:6px solid var(--surface2);box-shadow:0 30px 70px rgba(0,0,0,0.55);}
+
+/* Trust bar */
+.trust-bar{display:flex;flex-wrap:wrap;gap:14px 30px;justify-content:center;padding:28px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:20px 0 60px;color:var(--text-muted);font-size:13px;}
+.trust-item{display:flex;align-items:center;gap:8px;}
+.trust-item svg{color:var(--accent);}
+
+/* Section heading */
+.section-head{text-align:center;max-width:560px;margin:0 auto 44px;}
+.section-head .eyebrow{margin-bottom:14px;}
+.section-head h2{font-family:var(--font-display);font-size:30px;margin:0 0 12px;letter-spacing:-0.01em;}
+.section-head p{color:var(--text-muted);font-size:15px;line-height:1.6;margin:0;}
+section{padding:60px 0;}
+
+/* Feature grid */
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;}
+.feature-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;transition:border-color .15s ease;}
+.feature-card:hover{border-color:var(--accent);}
+.feature-icon{width:42px;height:42px;border-radius:11px;background:var(--accent-soft);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:16px;}
+.feature-card h3{font-family:var(--font-display);font-size:16px;margin:0 0 8px;}
+.feature-card p{color:var(--text-muted);font-size:13.5px;line-height:1.6;margin:0;}
+
+/* How it works */
+.steps{display:flex;gap:24px;flex-wrap:wrap;counter-reset:step;}
+.step{flex:1 1 240px;position:relative;padding:28px 22px 22px;background:var(--surface);border:1px solid var(--border);border-radius:14px;}
+.step-num{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#1B1508;font-weight:700;font-family:var(--font-mono);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:14px;}
+.step h3{font-family:var(--font-display);font-size:15px;margin:0 0 8px;}
+.step p{color:var(--text-muted);font-size:13.5px;line-height:1.6;margin:0;}
+
+/* Showcase */
+.showcase{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;align-items:flex-start;}
+.showcase img{width:270px;border-radius:20px;border:6px solid var(--surface2);box-shadow:0 24px 60px rgba(0,0,0,0.5);}
+
+/* Security callout */
+.security-box{background:var(--surface);border:1px solid var(--accent);border-radius:16px;padding:36px;display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap;}
+.security-box .feature-icon{flex-shrink:0;width:52px;height:52px;}
+.security-box h2{font-family:var(--font-display);font-size:22px;margin:0 0 10px;}
+.security-box p{color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:0 0 10px;max-width:640px;}
+.security-box code{background:var(--surface2);border:1px solid var(--border);padding:2px 6px;border-radius:5px;font-family:var(--font-mono);font-size:13px;color:var(--accent-strong);}
+
+/* CTA band */
+.cta-band{text-align:center;background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:20px;padding:56px 24px;}
+.cta-band h2{font-family:var(--font-display);font-size:28px;margin:0 0 12px;}
+.cta-band p{color:var(--text-muted);margin:0 0 26px;font-size:15px;}
+
+/* Footer */
+footer{border-top:1px solid var(--border);padding:32px 0 48px;color:var(--text-muted);font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+footer .brand{font-size:13px;color:var(--text-muted);}
+footer a{text-decoration:none;color:var(--text-muted);}
+footer a:hover{color:var(--accent);}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap;}
+
+@media (max-width:640px){
+  h1{font-size:32px;}
+  .hero{padding:48px 0 28px;flex-direction:column;}
+  .section-head h2{font-size:24px;}
+  .security-box{padding:24px;}
+}
+</style>
+</head>
+<body>
+<div class="vault-grid-bg"></div>
+
+<header>
+  <div class="wrap header-inner">
+    <div class="brand"><img src="icons/icon-192.png" alt="GeoPass Vault"> GeoPass Vault</div>
+    <a class="btn btn-primary btn-sm" href="index.html">Buka Aplikasi</a>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="hero" style="padding-top:76px;">
+    <div class="hero-copy">
+      <div class="eyebrow">🔒 AES-256 · Tanpa Server · Tanpa Akun</div>
+      <h1>Password Anda,<br>hanya milik <span>Anda</span>.</h1>
+      <p class="hero-sub">GeoPass Vault adalah pengelola password pribadi yang berjalan sepenuhnya offline di perangkat Anda. Tidak ada cloud, tidak ada akun, tidak ada yang bisa melihat data Anda selain Anda sendiri.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="index.html">Buka Aplikasi Sekarang →</a>
+        <a class="btn" href="https://github.com/Georehuel/geopass-vault" target="_blank" rel="noopener">Lihat Source Code di GitHub</a>
+      </div>
+      <div class="hero-note">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6z"/></svg>
+        Gratis, open source, dan bisa diperiksa sendiri kodenya — tidak ada yang disembunyikan.
+      </div>
+    </div>
+    <div class="hero-shot"><img src="landing-assets/crop-detail.png" alt="Tampilan detail data di GeoPass Vault"></div>
+  </section>
+
+  <div class="trust-bar">
+    <div class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Enkripsi AES-256</div>
+    <div class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12s-4 8-11 8a9.74 9.74 0 0 1-4-.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 1 12s4 8 11 8a9.74 9.74 0 0 0 5.39-1.61"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Tanpa Pelacakan</div>
+    <div class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> 100% Offline</div>
+    <div class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Bisa Diinstal di iPhone/Android</div>
+    <div class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg> Open Source</div>
+  </div>
+
+  <section id="fitur">
+    <div class="section-head">
+      <div class="eyebrow">Fitur</div>
+      <h2>Semua yang Anda butuhkan, tidak lebih</h2>
+      <p>Dirancang sederhana dan fokus — tanpa fitur berlebihan yang justru bikin ribet.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <h3>Enkripsi AES-256</h3>
+        <p>Setiap data dienkripsi dengan standar militer sebelum tersimpan. Bahkan jika file disalin, isinya tetap tidak terbaca.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="16" r="1"/><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 0 1 9.9-1"/></svg></div>
+        <h3>Mode Decoy</h3>
+        <p>Punya password kedua yang membuka vault kosong — berguna jika Anda pernah dipaksa membuka aplikasi.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><circle cx="8" cy="12" r="1"/></svg></div>
+        <h3>Mode Stealth</h3>
+        <p>Aplikasi bisa menyamar jadi kalkulator biasa yang benar-benar berfungsi. PIN rahasia membuka vault sungguhan.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></div>
+        <h3>Generator Password</h3>
+        <p>Buat password acak yang kuat sekali tap, lengkap dengan indikator kekuatan dan deteksi password yang dipakai berulang.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+        <h3>Kategori &amp; Tag</h3>
+        <p>Atur data dengan kategori custom dan tag bebas. Cari apapun dalam hitungan detik.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+        <h3>Backup Terenkripsi</h3>
+        <p>Export dan import kapan saja. File backup tetap terenkripsi penuh, tidak pernah dalam bentuk teks biasa.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+        <h3>3 Bahasa</h3>
+        <p>Bahasa Indonesia, English, dan 中文 — ganti kapan saja, seluruh aplikasi ikut berubah.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+        <h3>Auto-Lock &amp; Clipboard Clear</h3>
+        <p>Terkunci otomatis saat idle, dan salinan password otomatis terhapus dari clipboard setelah beberapa detik.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="cara-kerja">
+    <div class="section-head">
+      <div class="eyebrow">Cara Kerja</div>
+      <h2>Tiga langkah, tanpa akun</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><h3>Buat Master Password</h3><p>Satu password yang mengunci semuanya. Tidak dikirim kemana pun, tidak tersimpan dalam bentuk teks biasa.</p></div>
+      <div class="step"><div class="step-num">2</div><h3>Simpan Data Anda</h3><p>Setiap password, PIN, dan catatan langsung dienkripsi AES-256 sebelum disimpan di perangkat Anda.</p></div>
+      <div class="step"><div class="step-num">3</div><h3>Akses Kapan Saja, Offline</h3><p>Install ke Home Screen dan gunakan tanpa internet. Tidak ada server yang bisa down atau diretas.</p></div>
+    </div>
+  </section>
+
+  <section id="tampilan">
+    <div class="section-head">
+      <div class="eyebrow">Tampilan</div>
+      <h2>Simpel, cepat, dan mudah dipakai</h2>
+    </div>
+    <div class="showcase">
+      <img src="landing-assets/crop-vault.png" alt="Daftar data tersimpan di GeoPass Vault">
+      <img src="landing-assets/crop-sidebar.png" alt="Menu kategori dan navigasi GeoPass Vault">
+    </div>
+  </section>
+
+  <section id="keamanan">
+    <div class="security-box">
+      <div class="feature-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+      <div>
+        <h2>Kenapa Anda bisa percaya aplikasi ini?</h2>
+        <p>GeoPass Vault tidak punya server, tidak punya backend, dan tidak pernah mengirim data Anda kemana pun. Semua enkripsi terjadi langsung di perangkat Anda menggunakan <code>Web Crypto API</code> bawaan browser — teknologi standar yang sama dipakai oleh bank dan aplikasi keamanan lainnya.</p>
+        <p>Kode sumbernya terbuka sepenuhnya di GitHub — siapa pun bisa memeriksa persis apa yang dilakukan aplikasi ini, baris demi baris. Tidak ada iklan, tidak ada pelacakan, tidak ada model bisnis tersembunyi.</p>
+        <p style="margin-bottom:0;"><strong style="color:var(--text);">Penting:</strong> karena tidak ada server, tidak ada juga fitur "lupa password". Simpan Master Password Anda baik-baik, dan gunakan fitur backup secara rutin.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="cta-band">
+      <h2>Mulai amankan password Anda hari ini</h2>
+      <p>Gratis. Tanpa daftar. Tanpa kartu kredit. Selamanya.</p>
+      <a class="btn btn-primary" href="index.html">Buka GeoPass Vault →</a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap header-inner" style="width:100%;">
+    <div class="brand">GeoPass Vault · Dibuat dengan privasi sebagai prioritas utama</div>
+    <div class="footer-links">
+      <a href="index.html">Buka Aplikasi</a>
+      <a href="https://github.com/Georehuel/geopass-vault" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
