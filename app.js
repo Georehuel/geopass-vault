@@ -166,6 +166,8 @@ const ic = {
   download:()=>`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
   upload:()=>`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`,
   shieldCheck:()=>`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6z"/><polyline points="9 12 11 14 15 10"/></svg>`,
+  share:()=>`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>`,
+  mail:()=>`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6 12 13 2 6"/></svg>`,
 };
 
 /* ==================================================================
@@ -286,6 +288,13 @@ const I18N = {
     stealth_pin_placeholder: "PIN rahasia (4-8 digit)",
     stealth_pin_note: "Ketik PIN ini di kalkulator lalu tekan \"=\" untuk membuka vault.",
     backup_restore_heading: "Backup & Restore",
+    share_btn: "Bagikan",
+    email_btn: "Kirim via Email",
+    share_backup_text: "Backup GeoPass Vault (file terenkripsi)",
+    toast_share_unsupported: "Berbagi langsung tidak didukung browser ini — file sudah diunduh",
+    toast_share_failed: "Gagal membuka menu berbagi",
+    email_subject: "Backup GeoPass Vault",
+    email_body: "File backup terenkripsi sudah terunduh ke perangkat ini. Silakan lampirkan file .gpvault tersebut secara manual ke email ini sebelum mengirim (browser tidak mengizinkan lampiran otomatis demi keamanan).",
     export_btn: "Export",
     import_btn: "Import",
     backup_note: "File backup tetap terenkripsi. Import akan menggantikan seluruh isi vault ini.",
@@ -426,6 +435,13 @@ const I18N = {
     stealth_pin_placeholder: "Secret PIN (4-8 digits)",
     stealth_pin_note: "Type this PIN on the calculator, then press \"=\" to unlock the vault.",
     backup_restore_heading: "Backup & Restore",
+    share_btn: "Share",
+    email_btn: "Send via Email",
+    share_backup_text: "GeoPass Vault backup (encrypted file)",
+    toast_share_unsupported: "Direct sharing isn't supported in this browser — the file was downloaded instead",
+    toast_share_failed: "Failed to open the share menu",
+    email_subject: "GeoPass Vault Backup",
+    email_body: "The encrypted backup file has been downloaded to this device. Please manually attach the .gpvault file to this email before sending (browsers don't allow automatic attachments for security reasons).",
     export_btn: "Export",
     import_btn: "Import",
     backup_note: "Backup files remain encrypted. Importing will replace this vault's entire contents.",
@@ -566,6 +582,13 @@ const I18N = {
     stealth_pin_placeholder: "密PIN码（4-8位数字）",
     stealth_pin_note: "在计算器中输入此 PIN 码后按“=”即可解锁密码库。",
     backup_restore_heading: "备份与恢复",
+    share_btn: "分享",
+    email_btn: "通过邮件发送",
+    share_backup_text: "GeoPass Vault 备份（加密文件）",
+    toast_share_unsupported: "此浏览器不支持直接分享——文件已改为下载",
+    toast_share_failed: "打开分享菜单失败",
+    email_subject: "GeoPass Vault 备份",
+    email_body: "加密备份文件已下载到此设备。发送前请手动将 .gpvault 文件添加为附件（出于安全原因，浏览器不允许自动添加附件）。",
     export_btn: "导出",
     import_btn: "导入",
     backup_note: "备份文件仍为加密状态。导入将替换此密码库的全部内容。",
@@ -774,6 +797,36 @@ async function exportBackup(){
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
     showToast(t("toast_backup_downloaded"));
+  }catch(e){ showToast(t("toast_backup_failed")); }
+}
+async function makeBackupFile(){
+  const meta = await idbGet(`geopass-${State.session.slot}`);
+  const filename = `geopass-backup-${State.session.slot}-${Date.now()}.gpvault`;
+  const blob = new Blob([JSON.stringify(meta)], {type:"application/json"});
+  return new File([blob], filename, {type:"application/json"});
+}
+async function shareBackup(){
+  if(!State.session) return;
+  try{
+    const file = await makeBackupFile();
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({ files:[file], title: t("app_name"), text: t("share_backup_text") });
+    } else {
+      await exportBackup();
+      showToast(t("toast_share_unsupported"));
+    }
+  }catch(e){
+    if(e && e.name==="AbortError") return; // user cancelled the native share sheet
+    showToast(t("toast_share_failed"));
+  }
+}
+async function emailBackup(){
+  if(!State.session) return;
+  try{
+    await exportBackup();
+    const subject = encodeURIComponent(t("email_subject"));
+    const body = encodeURIComponent(t("email_body"));
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
   }catch(e){ showToast(t("toast_backup_failed")); }
 }
 function importBackup(file, slot){
@@ -1399,9 +1452,13 @@ function renderSettings(){
       </div>
 
       <div class="settings-heading">${t("backup_restore_heading")}</div>
-      <div style="display:flex;gap:8px;margin-bottom:4px;">
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
         <button class="btn" id="settings-export" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;">${ic.download()} ${t("export_btn")}</button>
         <button class="btn" id="settings-import-btn" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;">${ic.upload()} ${t("import_btn")}</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:4px;">
+        <button class="btn" id="settings-share" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;">${ic.share()} ${t("share_btn")}</button>
+        <button class="btn" id="settings-email" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;">${ic.mail()} ${t("email_btn")}</button>
       </div>
       <div class="settings-row-sub" style="margin-bottom:14px;">${t("backup_note")}</div>
       <input type="file" id="settings-import-file" accept=".gpvault,application/json" class="hidden">
@@ -1449,6 +1506,8 @@ function renderSettings(){
   document.getElementById("settings-export").onclick = exportBackup;
   document.getElementById("settings-import-btn").onclick = ()=>document.getElementById("settings-import-file").click();
   document.getElementById("settings-import-file").onchange = (e)=>{ const f=e.target.files[0]; if(f) importBackup(f, State.session.slot); };
+  document.getElementById("settings-share").onclick = shareBackup;
+  document.getElementById("settings-email").onclick = emailBackup;
 }
 
 function countEntriesInCategory(name){
