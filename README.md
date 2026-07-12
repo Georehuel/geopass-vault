@@ -77,7 +77,4 @@ versi terbaru; setelah itu offline seperti biasa.
   kalkulator, kategori, tag, pencarian, generator password, auto-lock,
   clipboard auto-clear, backup/restore) berfungsi penuh.
 
-
-  
-
 Done
