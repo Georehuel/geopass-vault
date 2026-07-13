@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GeoPass Vault — Password Manager Pribadi, Offline &amp; Terenkripsi</title>
-<meta name="description" content="Vault password pribadi yang sepenuhnya offline. AES-256, tanpa server, tanpa akun. Data Anda hanya ada di perangkat Anda.">
+<title data-i18n="page_title">GeoPass Vault — Password Manager Pribadi, Offline &amp; Terenkripsi</title>
+<meta name="description" id="meta-desc" content="Vault password pribadi yang sepenuhnya offline. AES-256, tanpa server, tanpa akun. Data Anda hanya ada di perangkat Anda.">
 <link rel="icon" href="icons/icon-192.png">
 <style>
 :root{
@@ -65,6 +65,9 @@ section{padding:60px 0;}
 .feature-icon{width:42px;height:42px;border-radius:11px;background:var(--accent-soft);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:16px;}
 .feature-card h3{font-family:var(--font-display);font-size:16px;margin:0 0 8px;}
 .feature-card p{color:var(--text-muted);font-size:13.5px;line-height:1.6;margin:0;}
+.install-steps{margin:0;padding-left:18px;color:var(--text-muted);font-size:13px;line-height:1.8;}
+.install-steps li{margin-bottom:3px;}
+.install-steps strong{color:var(--text);font-weight:600;}
 
 /* How it works */
 .steps{display:flex;gap:24px;flex-wrap:wrap;counter-reset:step;}
@@ -95,6 +98,9 @@ footer .brand{font-size:13px;color:var(--text-muted);}
 footer a{text-decoration:none;color:var(--text-muted);}
 footer a:hover{color:var(--accent);}
 .footer-links{display:flex;gap:20px;flex-wrap:wrap;}
+.lang-switch{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 10px;font-size:13px;font-family:var(--font-body);cursor:pointer;}
+.lang-switch:hover{border-color:var(--accent);}
+.header-actions{display:flex;align-items:center;gap:10px;}
 
 @media (max-width:640px){
   h1{font-size:32px;}
@@ -110,7 +116,14 @@ footer a:hover{color:var(--accent);}
 <header>
   <div class="wrap header-inner">
     <div class="brand"><img src="icons/icon-192.png" alt="GeoPass Vault"> GeoPass Vault</div>
-    <a class="btn btn-primary btn-sm" href="index.html">Buka Aplikasi</a>
+    <div class="header-actions">
+      <select id="lang-switch" class="lang-switch" aria-label="Language">
+        <option value="id">Bahasa Indonesia</option>
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+      </select>
+      <a class="btn btn-primary btn-sm" href="index.html" data-i18n="nav_open_app">Buka Aplikasi</a>
+    </div>
   </div>
 </header>
 
@@ -118,99 +131,141 @@ footer a:hover{color:var(--accent);}
 
   <section class="hero" style="padding-top:76px;">
     <div class="hero-copy">
-      <div class="eyebrow">🔒 AES-256 · Tanpa Server · Tanpa Akun</div>
-      <h1>Password Anda,<br>hanya milik <span>Anda</span>.</h1>
-      <p class="hero-sub">GeoPass Vault adalah pengelola password pribadi yang berjalan sepenuhnya offline di perangkat Anda. Tidak ada cloud, tidak ada akun, tidak ada yang bisa melihat data Anda selain Anda sendiri.</p>
+      <div class="eyebrow" data-i18n="hero_eyebrow">🔒 AES-256 · Tanpa Server · Tanpa Akun</div>
+      <h1 data-i18n="hero_title">Password Anda,<br>hanya milik <span>Anda</span>.</h1>
+      <p class="hero-sub" data-i18n="hero_sub">GeoPass Vault adalah pengelola password pribadi yang berjalan sepenuhnya offline di perangkat Anda. Tidak ada cloud, tidak ada akun, tidak ada yang bisa melihat data Anda selain Anda sendiri.</p>
       <div class="hero-ctas">
-        <a class="btn btn-primary" href="index.html">Buka Aplikasi Sekarang →</a>
-        <a class="btn" href="https://github.com/Georehuel/geopass-vault" target="_blank" rel="noopener">Lihat Source Code di GitHub</a>
+        <a class="btn btn-primary" href="index.html" data-i18n="hero_cta_primary">Buka Aplikasi Sekarang →</a>
+        <a class="btn" href="https://github.com/Georehuel/geopass-vault" target="_blank" rel="noopener" data-i18n="hero_cta_secondary">Lihat Source Code di GitHub</a>
       </div>
       <div class="hero-note">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6z"/></svg>
-        Gratis, open source, dan bisa diperiksa sendiri kodenya — tidak ada yang disembunyikan.
+        <span data-i18n="hero_note">Open source dan bisa diperiksa sendiri kodenya — tidak ada yang disembunyikan.</span>
       </div>
     </div>
-    <div class="hero-shot"><img src="landing-assets/crop-detail.png" alt="Tampilan detail data di GeoPass Vault"></div>
+    <div class="hero-shot"><img src="landing-assets/crop-detail.png" alt="Tampilan detail data di GeoPass Vault" data-i18n-alt="alt_detail"></div>
   </section>
 
   <div class="trust-bar">
-    <div class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Enkripsi AES-256</div>
-    <div class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12s-4 8-11 8a9.74 9.74 0 0 1-4-.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 1 12s4 8 11 8a9.74 9.74 0 0 0 5.39-1.61"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Tanpa Pelacakan</div>
-    <div class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> 100% Offline</div>
-    <div class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Bisa Diinstal di iPhone/Android</div>
-    <div class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg> Open Source</div>
+    <div class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> <span data-i18n="trust_1">Enkripsi AES-256</span></div>
+    <div class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12s-4 8-11 8a9.74 9.74 0 0 1-4-.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 1 12s4 8 11 8a9.74 9.74 0 0 0 5.39-1.61"/><line x1="9" y1="9" x2="15" y2="15"/></svg> <span data-i18n="trust_2">Tanpa Pelacakan</span></div>
+    <div class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> <span data-i18n="trust_3">100% Offline</span></div>
+    <div class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> <span data-i18n="trust_4">Bisa Diinstal di iPhone/Android</span></div>
+    <div class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg> <span data-i18n="trust_5">Open Source</span></div>
   </div>
 
   <section id="fitur">
     <div class="section-head">
-      <div class="eyebrow">Fitur</div>
-      <h2>Semua yang Anda butuhkan, tidak lebih</h2>
-      <p>Dirancang sederhana dan fokus — tanpa fitur berlebihan yang justru bikin ribet.</p>
+      <div class="eyebrow" data-i18n="fitur_eyebrow">Fitur</div>
+      <h2 data-i18n="fitur_title">Semua yang Anda butuhkan, tidak lebih</h2>
+      <p data-i18n="fitur_sub">Dirancang sederhana dan fokus — tanpa fitur berlebihan yang justru bikin ribet.</p>
     </div>
     <div class="feature-grid">
       <div class="feature-card">
         <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-        <h3>Enkripsi AES-256</h3>
-        <p>Setiap data dienkripsi dengan standar militer sebelum tersimpan. Bahkan jika file disalin, isinya tetap tidak terbaca.</p>
+        <h3 data-i18n="feat1_title">Enkripsi AES-256</h3>
+        <p data-i18n="feat1_desc">Setiap data dienkripsi dengan standar militer sebelum tersimpan. Bahkan jika file disalin, isinya tetap tidak terbaca.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="16" r="1"/><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 0 1 9.9-1"/></svg></div>
-        <h3>Mode Decoy</h3>
-        <p>Punya password kedua yang membuka vault kosong — berguna jika Anda pernah dipaksa membuka aplikasi.</p>
+        <h3 data-i18n="feat2_title">Mode Decoy</h3>
+        <p data-i18n="feat2_desc">Punya password kedua yang membuka vault kosong — berguna jika Anda pernah dipaksa membuka aplikasi.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><circle cx="8" cy="12" r="1"/></svg></div>
-        <h3>Mode Stealth</h3>
-        <p>Aplikasi bisa menyamar jadi kalkulator biasa yang benar-benar berfungsi. PIN rahasia membuka vault sungguhan.</p>
+        <h3 data-i18n="feat3_title">Mode Stealth</h3>
+        <p data-i18n="feat3_desc">Aplikasi bisa menyamar jadi kalkulator biasa yang benar-benar berfungsi. PIN rahasia membuka vault sungguhan.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></div>
-        <h3>Generator Password</h3>
-        <p>Buat password acak yang kuat sekali tap, lengkap dengan indikator kekuatan dan deteksi password yang dipakai berulang.</p>
+        <h3 data-i18n="feat4_title">Generator Password</h3>
+        <p data-i18n="feat4_desc">Buat password acak yang kuat sekali tap, lengkap dengan indikator kekuatan dan deteksi password yang dipakai berulang.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
-        <h3>Kategori &amp; Tag</h3>
-        <p>Atur data dengan kategori custom dan tag bebas. Cari apapun dalam hitungan detik.</p>
+        <h3 data-i18n="feat5_title">Kategori &amp; Tag</h3>
+        <p data-i18n="feat5_desc">Atur data dengan kategori custom dan tag bebas. Cari apapun dalam hitungan detik.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
-        <h3>Backup Terenkripsi</h3>
-        <p>Export dan import kapan saja. File backup tetap terenkripsi penuh, tidak pernah dalam bentuk teks biasa.</p>
+        <h3 data-i18n="feat6_title">Backup Terenkripsi</h3>
+        <p data-i18n="feat6_desc">Export dan import kapan saja. File backup tetap terenkripsi penuh, tidak pernah dalam bentuk teks biasa.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-        <h3>3 Bahasa</h3>
-        <p>Bahasa Indonesia, English, dan 中文 — ganti kapan saja, seluruh aplikasi ikut berubah.</p>
+        <h3 data-i18n="feat7_title">3 Bahasa</h3>
+        <p data-i18n="feat7_desc">Bahasa Indonesia, English, dan 中文 — ganti kapan saja, seluruh aplikasi ikut berubah.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
-        <h3>Auto-Lock &amp; Clipboard Clear</h3>
-        <p>Terkunci otomatis saat idle, dan salinan password otomatis terhapus dari clipboard setelah beberapa detik.</p>
+        <h3 data-i18n="feat8_title">Auto-Lock &amp; Clipboard Clear</h3>
+        <p data-i18n="feat8_desc">Terkunci otomatis saat idle, dan salinan password otomatis terhapus dari clipboard setelah beberapa detik.</p>
       </div>
     </div>
   </section>
 
   <section id="cara-kerja">
     <div class="section-head">
-      <div class="eyebrow">Cara Kerja</div>
-      <h2>Tiga langkah, tanpa akun</h2>
+      <div class="eyebrow" data-i18n="carakerja_eyebrow">Cara Kerja</div>
+      <h2 data-i18n="carakerja_title">Tiga langkah, tanpa akun</h2>
     </div>
     <div class="steps">
-      <div class="step"><div class="step-num">1</div><h3>Buat Master Password</h3><p>Satu password yang mengunci semuanya. Tidak dikirim kemana pun, tidak tersimpan dalam bentuk teks biasa.</p></div>
-      <div class="step"><div class="step-num">2</div><h3>Simpan Data Anda</h3><p>Setiap password, PIN, dan catatan langsung dienkripsi AES-256 sebelum disimpan di perangkat Anda.</p></div>
-      <div class="step"><div class="step-num">3</div><h3>Akses Kapan Saja, Offline</h3><p>Install ke Home Screen dan gunakan tanpa internet. Tidak ada server yang bisa down atau diretas.</p></div>
+      <div class="step"><div class="step-num">1</div><h3 data-i18n="step1_title">Buat Master Password</h3><p data-i18n="step1_desc">Satu password yang mengunci semuanya. Tidak dikirim kemana pun, tidak tersimpan dalam bentuk teks biasa.</p></div>
+      <div class="step"><div class="step-num">2</div><h3 data-i18n="step2_title">Simpan Data Anda</h3><p data-i18n="step2_desc">Setiap password, PIN, dan catatan langsung dienkripsi AES-256 sebelum disimpan di perangkat Anda.</p></div>
+      <div class="step"><div class="step-num">3</div><h3 data-i18n="step3_title">Akses Kapan Saja, Offline</h3><p data-i18n="step3_desc">Install ke Home Screen dan gunakan tanpa internet. Tidak ada server yang bisa down atau diretas.</p></div>
     </div>
   </section>
 
   <section id="tampilan">
     <div class="section-head">
-      <div class="eyebrow">Tampilan</div>
-      <h2>Simpel, cepat, dan mudah dipakai</h2>
+      <div class="eyebrow" data-i18n="tampilan_eyebrow">Tampilan</div>
+      <h2 data-i18n="tampilan_title">Simpel, cepat, dan mudah dipakai</h2>
     </div>
     <div class="showcase">
-      <img src="landing-assets/crop-vault.png" alt="Daftar data tersimpan di GeoPass Vault">
-      <img src="landing-assets/crop-sidebar.png" alt="Menu kategori dan navigasi GeoPass Vault">
+      <img src="landing-assets/crop-vault.png" alt="Daftar data tersimpan di GeoPass Vault" data-i18n-alt="alt_vault">
+      <img src="landing-assets/crop-sidebar.png" alt="Menu kategori dan navigasi GeoPass Vault" data-i18n-alt="alt_sidebar">
+    </div>
+  </section>
+
+  <section id="instalasi">
+    <div class="section-head">
+      <div class="eyebrow" data-i18n="instalasi_eyebrow">Instalasi</div>
+      <h2 data-i18n="instalasi_title">Bisa diinstal di semua perangkat Anda</h2>
+      <p data-i18n="instalasi_sub">Sekali diinstal, aplikasi berjalan seperti aplikasi native — dengan ikonnya sendiri, dan bisa dipakai offline.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3 data-i18n="install_android_title">📱 Android (Chrome)</h3>
+        <ol class="install-steps" data-i18n="install_android_steps">
+          <li>Buka link ini di <strong>Chrome</strong></li>
+          <li>Tap banner "Tambahkan ke Layar Utama" di bawah layar (atau menu <strong>⋮ → Instal aplikasi</strong>)</li>
+          <li>Tap <strong>Instal</strong></li>
+        </ol>
+      </div>
+      <div class="feature-card">
+        <h3 data-i18n="install_ios_title">🍎 iPhone / iPad (Safari)</h3>
+        <ol class="install-steps" data-i18n="install_ios_steps">
+          <li>Buka link ini di <strong>Safari</strong> (wajib Safari)</li>
+          <li>Tap ikon <strong>Share</strong> (kotak dengan panah ke atas)</li>
+          <li>Tap <strong>Add to Home Screen</strong> → <strong>Add</strong></li>
+        </ol>
+      </div>
+      <div class="feature-card">
+        <h3 data-i18n="install_win_title">💻 Windows (Chrome / Edge)</h3>
+        <ol class="install-steps" data-i18n="install_win_steps">
+          <li>Buka link ini di <strong>Chrome</strong> atau <strong>Edge</strong></li>
+          <li>Klik ikon <strong>Install</strong> di address bar (atau menu <strong>⋮ → Instal aplikasi</strong>)</li>
+          <li>Klik <strong>Install</strong></li>
+        </ol>
+      </div>
+      <div class="feature-card">
+        <h3 data-i18n="install_mac_title">🖥️ Mac (Safari / Chrome)</h3>
+        <ol class="install-steps" data-i18n="install_mac_steps">
+          <li>Safari: menu <strong>File → Add to Dock...</strong></li>
+          <li>atau Chrome: ikon <strong>Install</strong> di address bar</li>
+          <li>Klik <strong>Add</strong> / <strong>Install</strong></li>
+        </ol>
+      </div>
     </div>
   </section>
 
@@ -218,19 +273,19 @@ footer a:hover{color:var(--accent);}
     <div class="security-box">
       <div class="feature-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6z"/><polyline points="9 12 11 14 15 10"/></svg></div>
       <div>
-        <h2>Kenapa Anda bisa percaya aplikasi ini?</h2>
-        <p>GeoPass Vault tidak punya server, tidak punya backend, dan tidak pernah mengirim data Anda kemana pun. Semua enkripsi terjadi langsung di perangkat Anda menggunakan <code>Web Crypto API</code> bawaan browser — teknologi standar yang sama dipakai oleh bank dan aplikasi keamanan lainnya.</p>
-        <p>Kode sumbernya terbuka sepenuhnya di GitHub — siapa pun bisa memeriksa persis apa yang dilakukan aplikasi ini, baris demi baris. Tidak ada iklan, tidak ada pelacakan, tidak ada model bisnis tersembunyi.</p>
-        <p style="margin-bottom:0;"><strong style="color:var(--text);">Penting:</strong> karena tidak ada server, tidak ada juga fitur "lupa password". Simpan Master Password Anda baik-baik, dan gunakan fitur backup secara rutin.</p>
+        <h2 data-i18n="keamanan_title">Kenapa Anda bisa percaya aplikasi ini?</h2>
+        <p data-i18n="keamanan_p1">GeoPass Vault tidak punya server, tidak punya backend, dan tidak pernah mengirim data Anda kemana pun. Semua enkripsi terjadi langsung di perangkat Anda menggunakan <code>Web Crypto API</code> bawaan browser — teknologi standar yang sama dipakai oleh bank dan aplikasi keamanan lainnya.</p>
+        <p data-i18n="keamanan_p2">Kode sumbernya terbuka sepenuhnya di GitHub — siapa pun bisa memeriksa persis apa yang dilakukan aplikasi ini, baris demi baris. Tidak ada iklan, tidak ada pelacakan, tidak ada model bisnis tersembunyi.</p>
+        <p style="margin-bottom:0;" data-i18n="keamanan_p3"><strong style="color:var(--text);">Penting:</strong> karena tidak ada server, tidak ada juga fitur "lupa password". Simpan Master Password Anda baik-baik, dan gunakan fitur backup secara rutin.</p>
       </div>
     </div>
   </section>
 
   <section>
     <div class="cta-band">
-      <h2>Mulai amankan password Anda hari ini</h2>
-      <p>Gratis. Tanpa daftar. Tanpa kartu kredit. Selamanya.</p>
-      <a class="btn btn-primary" href="index.html">Buka GeoPass Vault →</a>
+      <h2 data-i18n="cta_title">Mulai amankan password Anda hari ini</h2>
+      <p data-i18n="cta_sub">Tanpa daftar akun. Tanpa iklan. Instalasi hanya butuh beberapa menit.</p>
+      <a class="btn btn-primary" href="index.html" data-i18n="cta_button">Buka GeoPass Vault →</a>
     </div>
   </section>
 
@@ -238,13 +293,212 @@ footer a:hover{color:var(--accent);}
 
 <footer>
   <div class="wrap header-inner" style="width:100%;">
-    <div class="brand">GeoPass Vault · Dibuat dengan privasi sebagai prioritas utama</div>
+    <div class="brand" data-i18n="footer_brand">GeoPass Vault · Dibuat dengan privasi sebagai prioritas utama</div>
     <div class="footer-links">
-      <a href="index.html">Buka Aplikasi</a>
+      <a href="index.html" data-i18n="nav_open_app">Buka Aplikasi</a>
       <a href="https://github.com/Georehuel/geopass-vault" target="_blank" rel="noopener">GitHub</a>
     </div>
   </div>
 </footer>
 
+<script>
+var LANDING_I18N = {
+  id: {
+    page_title: "GeoPass Vault — Password Manager Pribadi, Offline &amp; Terenkripsi",
+    meta_description: "Vault password pribadi yang sepenuhnya offline. AES-256, tanpa server, tanpa akun. Data Anda hanya ada di perangkat Anda.",
+    nav_open_app: "Buka Aplikasi",
+    hero_eyebrow: "🔒 AES-256 · Tanpa Server · Tanpa Akun",
+    hero_title: "Password Anda,<br>hanya milik <span>Anda</span>.",
+    hero_sub: "GeoPass Vault adalah pengelola password pribadi yang berjalan sepenuhnya offline di perangkat Anda. Tidak ada cloud, tidak ada akun, tidak ada yang bisa melihat data Anda selain Anda sendiri.",
+    hero_cta_primary: "Buka Aplikasi Sekarang →",
+    hero_cta_secondary: "Lihat Source Code di GitHub",
+    hero_note: "Open source dan bisa diperiksa sendiri kodenya — tidak ada yang disembunyikan.",
+    alt_detail: "Tampilan detail data di GeoPass Vault",
+    alt_vault: "Daftar data tersimpan di GeoPass Vault",
+    alt_sidebar: "Menu kategori dan navigasi GeoPass Vault",
+    trust_1: "Enkripsi AES-256", trust_2: "Tanpa Pelacakan", trust_3: "100% Offline",
+    trust_4: "Bisa Diinstal di iPhone/Android", trust_5: "Open Source",
+    fitur_eyebrow: "Fitur",
+    fitur_title: "Semua yang Anda butuhkan, tidak lebih",
+    fitur_sub: "Dirancang sederhana dan fokus — tanpa fitur berlebihan yang justru bikin ribet.",
+    feat1_title: "Enkripsi AES-256", feat1_desc: "Setiap data dienkripsi dengan standar militer sebelum tersimpan. Bahkan jika file disalin, isinya tetap tidak terbaca.",
+    feat2_title: "Mode Decoy", feat2_desc: "Punya password kedua yang membuka vault kosong — berguna jika Anda pernah dipaksa membuka aplikasi.",
+    feat3_title: "Mode Stealth", feat3_desc: "Aplikasi bisa menyamar jadi kalkulator biasa yang benar-benar berfungsi. PIN rahasia membuka vault sungguhan.",
+    feat4_title: "Generator Password", feat4_desc: "Buat password acak yang kuat sekali tap, lengkap dengan indikator kekuatan dan deteksi password yang dipakai berulang.",
+    feat5_title: "Kategori &amp; Tag", feat5_desc: "Atur data dengan kategori custom dan tag bebas. Cari apapun dalam hitungan detik.",
+    feat6_title: "Backup Terenkripsi", feat6_desc: "Export dan import kapan saja. File backup tetap terenkripsi penuh, tidak pernah dalam bentuk teks biasa.",
+    feat7_title: "3 Bahasa", feat7_desc: "Bahasa Indonesia, English, dan 中文 — ganti kapan saja, seluruh aplikasi ikut berubah.",
+    feat8_title: "Auto-Lock &amp; Clipboard Clear", feat8_desc: "Terkunci otomatis saat idle, dan salinan password otomatis terhapus dari clipboard setelah beberapa detik.",
+    carakerja_eyebrow: "Cara Kerja",
+    carakerja_title: "Tiga langkah, tanpa akun",
+    step1_title: "Buat Master Password", step1_desc: "Satu password yang mengunci semuanya. Tidak dikirim kemana pun, tidak tersimpan dalam bentuk teks biasa.",
+    step2_title: "Simpan Data Anda", step2_desc: "Setiap password, PIN, dan catatan langsung dienkripsi AES-256 sebelum disimpan di perangkat Anda.",
+    step3_title: "Akses Kapan Saja, Offline", step3_desc: "Install ke Home Screen dan gunakan tanpa internet. Tidak ada server yang bisa down atau diretas.",
+    tampilan_eyebrow: "Tampilan",
+    tampilan_title: "Simpel, cepat, dan mudah dipakai",
+    instalasi_eyebrow: "Instalasi",
+    instalasi_title: "Bisa diinstal di semua perangkat Anda",
+    instalasi_sub: "Sekali diinstal, aplikasi berjalan seperti aplikasi native — dengan ikonnya sendiri, dan bisa dipakai offline.",
+    install_android_title: "📱 Android (Chrome)",
+    install_android_steps: '<li>Buka link ini di <strong>Chrome</strong></li><li>Tap banner "Tambahkan ke Layar Utama" di bawah layar (atau menu <strong>⋮ → Instal aplikasi</strong>)</li><li>Tap <strong>Instal</strong></li>',
+    install_ios_title: "🍎 iPhone / iPad (Safari)",
+    install_ios_steps: '<li>Buka link ini di <strong>Safari</strong> (wajib Safari)</li><li>Tap ikon <strong>Share</strong> (kotak dengan panah ke atas)</li><li>Tap <strong>Add to Home Screen</strong> → <strong>Add</strong></li>',
+    install_win_title: "💻 Windows (Chrome / Edge)",
+    install_win_steps: '<li>Buka link ini di <strong>Chrome</strong> atau <strong>Edge</strong></li><li>Klik ikon <strong>Install</strong> di address bar (atau menu <strong>⋮ → Instal aplikasi</strong>)</li><li>Klik <strong>Install</strong></li>',
+    install_mac_title: "🖥️ Mac (Safari / Chrome)",
+    install_mac_steps: '<li>Safari: menu <strong>File → Add to Dock...</strong></li><li>atau Chrome: ikon <strong>Install</strong> di address bar</li><li>Klik <strong>Add</strong> / <strong>Install</strong></li>',
+    keamanan_title: "Kenapa Anda bisa percaya aplikasi ini?",
+    keamanan_p1: 'GeoPass Vault tidak punya server, tidak punya backend, dan tidak pernah mengirim data Anda kemana pun. Semua enkripsi terjadi langsung di perangkat Anda menggunakan <code>Web Crypto API</code> bawaan browser — teknologi standar yang sama dipakai oleh bank dan aplikasi keamanan lainnya.',
+    keamanan_p2: "Kode sumbernya terbuka sepenuhnya di GitHub — siapa pun bisa memeriksa persis apa yang dilakukan aplikasi ini, baris demi baris. Tidak ada iklan, tidak ada pelacakan, tidak ada model bisnis tersembunyi.",
+    keamanan_p3: '<strong style="color:var(--text);">Penting:</strong> karena tidak ada server, tidak ada juga fitur "lupa password". Simpan Master Password Anda baik-baik, dan gunakan fitur backup secara rutin.',
+    cta_title: "Mulai amankan password Anda hari ini",
+    cta_sub: "Tanpa daftar akun. Tanpa iklan. Instalasi hanya butuh beberapa menit.",
+    cta_button: "Buka GeoPass Vault →",
+    footer_brand: "GeoPass Vault · Dibuat dengan privasi sebagai prioritas utama",
+  },
+  en: {
+    page_title: "GeoPass Vault — Private, Offline &amp; Encrypted Password Manager",
+    meta_description: "A fully offline personal password vault. AES-256, no server, no account. Your data only ever lives on your device.",
+    nav_open_app: "Open App",
+    hero_eyebrow: "🔒 AES-256 · No Server · No Account",
+    hero_title: "Your passwords,<br>belong only to <span>you</span>.",
+    hero_sub: "GeoPass Vault is a personal password manager that runs entirely offline on your device. No cloud, no account, nobody can see your data but you.",
+    hero_cta_primary: "Open the App Now →",
+    hero_cta_secondary: "View Source Code on GitHub",
+    hero_note: "Open source and fully inspectable — nothing hidden.",
+    alt_detail: "Entry detail view in GeoPass Vault",
+    alt_vault: "Saved entries list in GeoPass Vault",
+    alt_sidebar: "Category and navigation menu in GeoPass Vault",
+    trust_1: "AES-256 Encryption", trust_2: "No Tracking", trust_3: "100% Offline",
+    trust_4: "Installable on iPhone/Android", trust_5: "Open Source",
+    fitur_eyebrow: "Features",
+    fitur_title: "Everything you need, nothing you don't",
+    fitur_sub: "Designed to be simple and focused — no bloated features that just get in the way.",
+    feat1_title: "AES-256 Encryption", feat1_desc: "Every entry is encrypted to a military-grade standard before it's stored. Even if the file were copied, its contents stay unreadable.",
+    feat2_title: "Decoy Mode", feat2_desc: "A second password that opens an empty vault — useful if you're ever forced to open the app.",
+    feat3_title: "Stealth Mode", feat3_desc: "The app can disguise itself as a fully working calculator. A secret PIN reveals the real vault.",
+    feat4_title: "Password Generator", feat4_desc: "Generate a strong random password in one tap, complete with a strength meter and reused-password detection.",
+    feat5_title: "Categories &amp; Tags", feat5_desc: "Organize entries with custom categories and free-form tags. Find anything in seconds.",
+    feat6_title: "Encrypted Backup", feat6_desc: "Export and import anytime. Backup files stay fully encrypted, never in plain text.",
+    feat7_title: "3 Languages", feat7_desc: "Bahasa Indonesia, English, and 中文 — switch anytime, the whole app updates instantly.",
+    feat8_title: "Auto-Lock &amp; Clipboard Clear", feat8_desc: "Locks automatically when idle, and copied passwords are automatically cleared from the clipboard after a few seconds.",
+    carakerja_eyebrow: "How It Works",
+    carakerja_title: "Three steps, no account",
+    step1_title: "Create a Master Password", step1_desc: "One password that locks everything else. Never sent anywhere, never stored as plain text.",
+    step2_title: "Save Your Data", step2_desc: "Every password, PIN, and note is encrypted with AES-256 before being stored on your device.",
+    step3_title: "Access It Anytime, Offline", step3_desc: "Install it to your Home Screen and use it without internet. There's no server to go down or get hacked.",
+    tampilan_eyebrow: "Interface",
+    tampilan_title: "Simple, fast, and easy to use",
+    instalasi_eyebrow: "Installation",
+    instalasi_title: "Installable on all your devices",
+    instalasi_sub: "Once installed, it runs like a native app — with its own icon, and works offline.",
+    install_android_title: "📱 Android (Chrome)",
+    install_android_steps: '<li>Open this link in <strong>Chrome</strong></li><li>Tap the "Add to Home Screen" banner at the bottom (or menu <strong>⋮ → Install app</strong>)</li><li>Tap <strong>Install</strong></li>',
+    install_ios_title: "🍎 iPhone / iPad (Safari)",
+    install_ios_steps: '<li>Open this link in <strong>Safari</strong> (must be Safari)</li><li>Tap the <strong>Share</strong> icon (a box with an arrow up)</li><li>Tap <strong>Add to Home Screen</strong> → <strong>Add</strong></li>',
+    install_win_title: "💻 Windows (Chrome / Edge)",
+    install_win_steps: '<li>Open this link in <strong>Chrome</strong> or <strong>Edge</strong></li><li>Click the <strong>Install</strong> icon in the address bar (or menu <strong>⋮ → Install app</strong>)</li><li>Click <strong>Install</strong></li>',
+    install_mac_title: "🖥️ Mac (Safari / Chrome)",
+    install_mac_steps: '<li>Safari: menu <strong>File → Add to Dock...</strong></li><li>or Chrome: the <strong>Install</strong> icon in the address bar</li><li>Click <strong>Add</strong> / <strong>Install</strong></li>',
+    keamanan_title: "Why can you trust this app?",
+    keamanan_p1: 'GeoPass Vault has no server, no backend, and never sends your data anywhere. All encryption happens directly on your device using the browser\'s built-in <code>Web Crypto API</code> — the same standard technology used by banks and other security apps.',
+    keamanan_p2: "The source code is fully open on GitHub — anyone can check exactly what this app does, line by line. No ads, no tracking, no hidden business model.",
+    keamanan_p3: '<strong style="color:var(--text);">Important:</strong> because there\'s no server, there\'s also no "forgot password" feature. Keep your Master Password safe, and use the backup feature regularly.',
+    cta_title: "Start securing your passwords today",
+    cta_sub: "No account sign-up. No ads. Installation takes just a few minutes.",
+    cta_button: "Open GeoPass Vault →",
+    footer_brand: "GeoPass Vault · Built with privacy as the top priority",
+  },
+  zh: {
+    page_title: "GeoPass Vault — 私密、离线、加密的密码管理器",
+    meta_description: "完全离线的个人密码库。AES-256 加密，没有服务器，没有账户。您的数据只存在于您的设备上。",
+    nav_open_app: "打开应用",
+    hero_eyebrow: "🔒 AES-256 · 无服务器 · 无需账户",
+    hero_title: "您的密码，<br>只属于<span>您自己</span>。",
+    hero_sub: "GeoPass Vault 是一款完全离线运行的个人密码管理器。没有云端，没有账户，除了您自己，没有人能看到您的数据。",
+    hero_cta_primary: "立即打开应用 →",
+    hero_cta_secondary: "在 GitHub 上查看源代码",
+    hero_note: "开源且可自行检查代码——没有任何隐藏。",
+    alt_detail: "GeoPass Vault 数据详情界面",
+    alt_vault: "GeoPass Vault 已保存数据列表",
+    alt_sidebar: "GeoPass Vault 分类与导航菜单",
+    trust_1: "AES-256 加密", trust_2: "无追踪", trust_3: "100% 离线",
+    trust_4: "可安装于 iPhone/Android", trust_5: "开源",
+    fitur_eyebrow: "功能",
+    fitur_title: "您需要的一切，不多不少",
+    fitur_sub: "设计简单专注——没有让人困惑的多余功能。",
+    feat1_title: "AES-256 加密", feat1_desc: "每条数据在存储前都会以军用级标准加密。即使文件被复制，内容依然无法读取。",
+    feat2_title: "伪装密码库", feat2_desc: "第二组密码可打开一个空的密码库——在被迫打开应用时非常有用。",
+    feat3_title: "隐藏模式", feat3_desc: "应用可以伪装成一个真正可用的计算器。输入密PIN码即可显示真正的密码库。",
+    feat4_title: "密码生成器", feat4_desc: "一键生成高强度随机密码，并附带强度指示器和重复密码检测。",
+    feat5_title: "分类与标签", feat5_desc: "使用自定义分类和自由标签整理数据，几秒内就能找到任何内容。",
+    feat6_title: "加密备份", feat6_desc: "随时导出和导入。备份文件始终保持完全加密，绝不会是明文。",
+    feat7_title: "支持三种语言", feat7_desc: "Bahasa Indonesia、English 和中文——随时切换，整个应用即时更新。",
+    feat8_title: "自动锁定与剪贴板清除", feat8_desc: "闲置时自动锁定，复制的密码会在几秒后自动从剪贴板清除。",
+    carakerja_eyebrow: "使用方式",
+    carakerja_title: "三个步骤，无需账户",
+    step1_title: "创建主密码", step1_desc: "一个密码锁定一切。不会发送到任何地方，也不会以明文形式存储。",
+    step2_title: "保存您的数据", step2_desc: "每个密码、PIN 码和备注在存储到您的设备之前都会立即用 AES-256 加密。",
+    step3_title: "随时离线访问", step3_desc: "安装到主屏幕后即可离线使用。没有服务器，也就没有宕机或被入侵的风险。",
+    tampilan_eyebrow: "界面",
+    tampilan_title: "简单、快速、易于使用",
+    instalasi_eyebrow: "安装方式",
+    instalasi_title: "可安装在您的所有设备上",
+    instalasi_sub: "安装后即像原生应用一样运行——拥有自己的图标，并可离线使用。",
+    install_android_title: "📱 Android（Chrome）",
+    install_android_steps: '<li>用 <strong>Chrome</strong> 打开此链接</li><li>点击屏幕底部的“添加到主屏幕”提示（或菜单 <strong>⋮ → 安装应用</strong>）</li><li>点击<strong>安装</strong></li>',
+    install_ios_title: "🍎 iPhone / iPad（Safari）",
+    install_ios_steps: '<li>用 <strong>Safari</strong> 打开此链接（必须是 Safari）</li><li>点击 <strong>分享</strong> 图标（带向上箭头的方框）</li><li>点击 <strong>添加到主屏幕</strong> → <strong>添加</strong></li>',
+    install_win_title: "💻 Windows（Chrome / Edge）",
+    install_win_steps: '<li>用 <strong>Chrome</strong> 或 <strong>Edge</strong> 打开此链接</li><li>点击地址栏中的<strong>安装</strong>图标（或菜单 <strong>⋮ → 安装应用</strong>）</li><li>点击<strong>安装</strong></li>',
+    install_mac_title: "🖥️ Mac（Safari / Chrome）",
+    install_mac_steps: '<li>Safari：菜单 <strong>文件 → 添加到程序坞...</strong></li><li>或 Chrome：地址栏中的<strong>安装</strong>图标</li><li>点击<strong>添加</strong> / <strong>安装</strong></li>',
+    keamanan_title: "为什么可以信任这款应用？",
+    keamanan_p1: 'GeoPass Vault 没有服务器，没有后端，也从不将您的数据发送到任何地方。所有加密都直接在您的设备上使用浏览器内置的 <code>Web Crypto API</code> 完成——这与银行和其他安全应用采用的标准技术相同。',
+    keamanan_p2: "源代码在 GitHub 上完全开放——任何人都可以逐行检查这款应用究竟做了什么。没有广告，没有追踪，没有隐藏的商业模式。",
+    keamanan_p3: '<strong style="color:var(--text);">重要提示：</strong>由于没有服务器，因此也没有“忘记密码”功能。请妥善保管您的主密码，并定期使用备份功能。',
+    cta_title: "今天就开始保护您的密码",
+    cta_sub: "无需注册账户，没有广告，几分钟内即可完成安装。",
+    cta_button: "打开 GeoPass Vault →",
+    footer_brand: "GeoPass Vault · 以隐私为首要原则打造",
+  },
+};
+
+function applyLandingLang(lang){
+  var dict = LANDING_I18N[lang] || LANDING_I18N.id;
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(function(el){
+    var key = el.getAttribute("data-i18n");
+    if(dict[key] !== undefined) el.innerHTML = dict[key];
+  });
+  document.querySelectorAll("[data-i18n-alt]").forEach(function(el){
+    var key = el.getAttribute("data-i18n-alt");
+    if(dict[key] !== undefined) el.alt = dict[key];
+  });
+  if(dict.page_title){ document.title = dict.page_title.replace(/&amp;/g, "&"); }
+  var metaDesc = document.getElementById("meta-desc");
+  if(metaDesc && dict.meta_description) metaDesc.setAttribute("content", dict.meta_description);
+  try{ localStorage.setItem("geopass-landing-lang", lang); }catch(e){}
+  var sel = document.getElementById("lang-switch");
+  if(sel) sel.value = lang;
+}
+
+(function initLandingLang(){
+  var saved = null;
+  try{ saved = localStorage.getItem("geopass-landing-lang"); }catch(e){}
+  var lang = saved;
+  if(!lang){
+    var nav = (navigator.language || "id").toLowerCase();
+    if(nav.indexOf("zh") === 0) lang = "zh";
+    else if(nav.indexOf("id") === 0) lang = "id";
+    else if(nav.indexOf("en") === 0) lang = "en";
+    else lang = "id";
+  }
+  applyLandingLang(lang);
+  document.getElementById("lang-switch").addEventListener("change", function(e){
+    applyLandingLang(e.target.value);
+  });
+})();
+</script>
 </body>
 </html>
