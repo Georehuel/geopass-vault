@@ -75,6 +75,15 @@ async function idbSet(key,value){
     tx.onerror=()=>reject(tx.error);
   });
 }
+async function idbDelete(key){
+  const db = await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction(STORE,"readwrite");
+    tx.objectStore(STORE).delete(key);
+    tx.oncomplete=()=>resolve(true);
+    tx.onerror=()=>reject(tx.error);
+  });
+}
 
 /* ==================================================================
    Small utils
@@ -320,6 +329,23 @@ const I18N = {
     clear_history_btn: "Hapus",
     no_history_yet: "Belum ada riwayat perhitungan",
     native_features_heading: "Fitur Native",
+    decoy_toggle_label: "Aktifkan Mode Decoy",
+    decoy_toggle_sub: "Password kedua yang membuka vault kosong",
+    change_decoy_btn: "Ganti Password Decoy",
+    new_decoy_password_placeholder: "Password Decoy Baru",
+    confirm_disable_decoy: "Menonaktifkan Mode Decoy akan menghapus vault decoy yang ada. Lanjutkan?",
+    toast_decoy_changed: "Password decoy diubah",
+    danger_zone_heading: "Zona Berbahaya",
+    about_app_btn: "Tentang Aplikasi Ini",
+    panic_reset_btn: "Reset Darurat (Panic Reset)",
+    panic_title: "Reset Darurat",
+    panic_warning_1: "⚠️ PERINGATAN: Tindakan ini akan MENGHAPUS SEMUA data secara PERMANEN \u2014 seluruh password, kategori, pengaturan, dan vault decoy (jika ada). Tidak dapat dibatalkan, tidak dapat dipulihkan. Pastikan Anda benar-benar ingin melakukan ini.",
+    panic_enter_password: "Masukkan Master Password Anda untuk melanjutkan",
+    panic_warning_2: "Ini adalah kesempatan terakhir. Setelah Anda menekan tombol di bawah, SEMUA DATA AKAN HILANG SELAMANYA \u2014 tidak ada cara untuk mengembalikannya, bahkan oleh kami.",
+    panic_confirm_password: "Masukkan Master Password sekali lagi untuk konfirmasi final",
+    panic_continue_btn: "Saya Mengerti, Lanjutkan",
+    panic_execute_btn: "HAPUS SEMUA DATA SEKARANG",
+    toast_panic_done: "Aplikasi telah direset. Silakan buat Master Password baru.",
   },
   en: {
     loading: "Loading...",
@@ -467,6 +493,23 @@ const I18N = {
     clear_history_btn: "Clear",
     no_history_yet: "No calculations yet",
     native_features_heading: "Native Features",
+    decoy_toggle_label: "Enable Decoy Mode",
+    decoy_toggle_sub: "A second password that opens an empty vault",
+    change_decoy_btn: "Change Decoy Password",
+    new_decoy_password_placeholder: "New Decoy Password",
+    confirm_disable_decoy: "Disabling Decoy Mode will delete the existing decoy vault. Continue?",
+    toast_decoy_changed: "Decoy password changed",
+    danger_zone_heading: "Danger Zone",
+    about_app_btn: "About This App",
+    panic_reset_btn: "Panic Reset",
+    panic_title: "Panic Reset",
+    panic_warning_1: "\u26a0\ufe0f WARNING: This will PERMANENTLY DELETE ALL data \u2014 every password, category, setting, and the decoy vault (if any). This cannot be undone or recovered. Make sure you truly want to do this.",
+    panic_enter_password: "Enter your Master Password to continue",
+    panic_warning_2: "This is your last chance. Once you press the button below, ALL DATA WILL BE GONE FOREVER \u2014 there is no way to get it back, not even by us.",
+    panic_confirm_password: "Enter your Master Password once more for final confirmation",
+    panic_continue_btn: "I Understand, Continue",
+    panic_execute_btn: "DELETE ALL DATA NOW",
+    toast_panic_done: "The app has been reset. Please create a new Master Password.",
   },
   zh: {
     loading: "加载中...",
@@ -613,7 +656,24 @@ const I18N = {
     history_heading: "历史记录",
     clear_history_btn: "清除",
     no_history_yet: "还没有计算记录",
-    native_features_heading: "原生功能",
+    native_features_heading: "\u539f\u751f\u529f\u80fd",
+    decoy_toggle_label: "\u542f\u7528\u4f2a\u88c5\u6a21\u5f0f",
+    decoy_toggle_sub: "\u7b2c\u4e8c\u7ec4\u5bc6\u7801\u5c06\u6253\u5f00\u4e00\u4e2a\u7a7a\u7684\u5bc6\u7801\u5e93",
+    change_decoy_btn: "\u66f4\u6539\u4f2a\u88c5\u5bc6\u7801",
+    new_decoy_password_placeholder: "\u65b0\u7684\u4f2a\u88c5\u5bc6\u7801",
+    confirm_disable_decoy: "\u7981\u7528\u4f2a\u88c5\u6a21\u5f0f\u5c06\u5220\u9664\u73b0\u6709\u7684\u4f2a\u88c5\u5bc6\u7801\u5e93\u3002\u662f\u5426\u7ee7\u7eed\uff1f",
+    toast_decoy_changed: "\u4f2a\u88c5\u5bc6\u7801\u5df2\u66f4\u6539",
+    danger_zone_heading: "\u5371\u9669\u533a\u57df",
+    about_app_btn: "\u5173\u4e8e\u6b64\u5e94\u7528",
+    panic_reset_btn: "\u7d27\u6025\u91cd\u7f6e\uff08Panic Reset\uff09",
+    panic_title: "\u7d27\u6025\u91cd\u7f6e",
+    panic_warning_1: "\u26a0\ufe0f \u8b66\u544a\uff1a\u6b64\u64cd\u4f5c\u5c06\u6c38\u4e45\u5220\u9664\u6240\u6709\u6570\u636e\u2014\u2014\u6240\u6709\u5bc6\u7801\u3001\u5206\u7c7b\u3001\u8bbe\u7f6e\u4ee5\u53ca\u4f2a\u88c5\u5bc6\u7801\u5e93\uff08\u5982\u679c\u5b58\u5728\uff09\u3002\u6b64\u64cd\u4f5c\u65e0\u6cd5\u64a4\u9500\uff0c\u4e5f\u65e0\u6cd5\u6062\u590d\u3002\u8bf7\u786e\u8ba4\u60a8\u771f\u7684\u8981\u8fd9\u6837\u505a\u3002",
+    panic_enter_password: "\u8bf7\u8f93\u5165\u60a8\u7684\u4e3b\u5bc6\u7801\u4ee5\u7ee7\u7eed",
+    panic_warning_2: "\u8fd9\u662f\u6700\u540e\u7684\u673a\u4f1a\u3002\u4e00\u65e6\u60a8\u70b9\u51fb\u4e0b\u65b9\u6309\u94ae\uff0c\u6240\u6709\u6570\u636e\u5c06\u6c38\u4e45\u4e22\u5931\u2014\u2014\u6ca1\u6709\u4efb\u4f55\u65b9\u6cd5\u53ef\u4ee5\u6062\u590d\uff0c\u5305\u62ec\u6211\u4eec\u4e5f\u65e0\u6cd5\u5e2e\u60a8\u627e\u56de\u3002",
+    panic_confirm_password: "\u8bf7\u518d\u6b21\u8f93\u5165\u4e3b\u5bc6\u7801\u4ee5\u8fdb\u884c\u6700\u7ec8\u786e\u8ba4",
+    panic_continue_btn: "\u6211\u660e\u767d\uff0c\u7ee7\u7eed",
+    panic_execute_btn: "\u7acb\u5373\u5220\u9664\u6240\u6709\u6570\u636e",
+    toast_panic_done: "\u5e94\u7528\u5df2\u91cd\u7f6e\u3002\u8bf7\u521b\u5efa\u65b0\u7684\u4e3b\u5bc6\u7801\u3002",
   },
 };
 function t(key, vars){
@@ -634,6 +694,7 @@ const State = {
   detailEntryId: null,
   formDraft: null,
   calc: { display:"0", pinBuffer:"", acc:null, op:null, expr:"", history:[], justEvaluated:false },
+  panicStep: null,
 };
 let toastTimer=null, clipboardTimer=null, idleTimer=null, saveTimer=null, autoLockBound=false;
 
@@ -642,6 +703,11 @@ let toastTimer=null, clipboardTimer=null, idleTimer=null, saveTimer=null, autoLo
    ================================================================== */
 function goStage(stage){
   State.stage = stage;
+  clearTimeout(toastTimer);
+  const toastEl = document.getElementById("toast");
+  toastEl.classList.add("hidden");
+  toastEl.classList.remove("hiding");
+  toastEl.textContent = "";
   ["loading","stealth","setup","locked","unlocked"].forEach(s=>{
     const el = document.getElementById("screen-"+s);
     el.classList.toggle("hidden", s!==stage);
@@ -781,6 +847,10 @@ async function setupDecoy(pw){
   const meta = { salt, iterations: PBKDF2_ITER, verify, vault: dataEnc };
   await idbSet("geopass-decoy", meta);
   await persistSettings(Object.assign({}, State.settings, {hasDecoy:true}));
+}
+async function disableDecoy(){
+  try{ await idbDelete("geopass-decoy"); }catch(e){ /* ignore */ }
+  await persistSettings(Object.assign({}, State.settings, {hasDecoy:false}));
 }
 
 /* ==================================================================
@@ -929,7 +999,6 @@ function quickCopy(id){
    ================================================================== */
 function renderSidebar(){
   const s = State.settings, session = State.session, v = State.view;
-  document.getElementById("sb-decoy-badge").classList.toggle("hidden", session.slot!=="decoy");
   document.getElementById("sb-quick").innerHTML = `
     <button class="sb-item ${v.filterCat===null&&!v.filterTag&&!v.filterFav&&!v.filterRecent?'active':''}" data-quick="all">${ic.folder()} ${t("all_data")}</button>
     <button class="sb-item ${v.filterFav?'active':''}" data-quick="fav">${ic.star(v.filterFav)} ${t("favorites")}</button>
@@ -1439,9 +1508,12 @@ function renderSettings(){
       <div class="err" id="mp-err"></div>
       <button class="btn full" id="mp-submit">${t("change_password_btn")}</button>
 
+      ${slot!=="decoy" ? `
       <div class="settings-heading">${t("decoy_mode_heading")}</div>
-      <div class="settings-row-sub" style="margin-bottom:10px;">${(s.hasDecoy||slot==="decoy") ? t("decoy_active_note") : t("decoy_inactive_note")}</div>
-      <div id="decoy-area">${(slot!=="decoy" && !s.hasDecoy) ? `<button class="btn full" id="decoy-open-btn">${t("create_decoy_btn")}</button>` : ""}</div>
+      <div class="settings-row"><div><div class="settings-row-label">${t("decoy_toggle_label")}</div><div class="settings-row-sub">${t("decoy_toggle_sub")}</div></div>
+        <input type="checkbox" id="settings-decoy-toggle" ${s.hasDecoy?'checked':''}></div>
+      <div id="decoy-area" style="margin-bottom:14px;">${s.hasDecoy ? `<button class="btn full" id="decoy-change-btn">${t("change_decoy_btn")}</button>` : ""}</div>
+      ` : ""}
 
       <div class="settings-heading">${t("stealth_mode_heading")}</div>
       <div class="settings-row"><div><div class="settings-row-label">${t("stealth_toggle_label")}</div><div class="settings-row-sub">${t("stealth_toggle_sub")}</div></div>
@@ -1464,6 +1536,10 @@ function renderSettings(){
       <input type="file" id="settings-import-file" accept=".gpvault,application/json" class="hidden">
 
       <div class="settings-note">${ic.shieldCheck()} <span>${t("native_note")}</span></div>
+
+      <div class="settings-heading">${t("danger_zone_heading")}</div>
+      <button class="btn full" id="settings-open-landing" style="margin-bottom:8px;">${ic.share()} ${t("about_app_btn")}</button>
+      <button class="btn full btn-danger" id="settings-panic-reset" style="border-color:var(--danger);">${ic.warn()} ${t("panic_reset_btn")}</button>
     </div>`;
   document.getElementById("settings-close").onclick = closeSettings;
   renderCategoryManageList();
@@ -1481,22 +1557,49 @@ function renderSettings(){
     if(!ok) errEl.textContent=t("err_old_password_wrong");
     else { document.getElementById("mp-old").value=""; document.getElementById("mp-new").value=""; showToast(t("toast_password_changed")); }
   };
-  const decoyOpenBtn = document.getElementById("decoy-open-btn");
-  if(decoyOpenBtn){
-    decoyOpenBtn.onclick = ()=>{
+  const decoyToggle = document.getElementById("settings-decoy-toggle");
+  if(decoyToggle){
+    decoyToggle.onchange = async (e)=>{
+      if(e.target.checked){
+        document.getElementById("decoy-area").innerHTML = `
+          <input class="input" type="password" placeholder="${t("decoy_password_placeholder")}" id="decoy-pw">
+          <div class="err" id="decoy-err"></div>
+          <button class="btn btn-primary full" id="decoy-submit">${t("save_decoy_btn")}</button>`;
+        document.getElementById("decoy-submit").onclick = async ()=>{
+          const pw = document.getElementById("decoy-pw").value;
+          const errEl = document.getElementById("decoy-err");
+          if(pw.length<8){ errEl.textContent=t("err_decoy_min"); return; }
+          try{ await setupDecoy(pw); renderSettings(); showToast(t("toast_decoy_created")); }
+          catch(e2){ errEl.textContent=t("err_decoy_failed"); }
+        };
+      } else {
+        if(confirm(t("confirm_disable_decoy"))){
+          await disableDecoy();
+          renderSettings();
+        } else {
+          e.target.checked = true;
+        }
+      }
+    };
+  }
+  const decoyChangeBtn = document.getElementById("decoy-change-btn");
+  if(decoyChangeBtn){
+    decoyChangeBtn.onclick = ()=>{
       document.getElementById("decoy-area").innerHTML = `
-        <input class="input" type="password" placeholder="${t("decoy_password_placeholder")}" id="decoy-pw">
-        <div class="err" id="decoy-err"></div>
-        <button class="btn btn-primary full" id="decoy-submit">${t("save_decoy_btn")}</button>`;
-      document.getElementById("decoy-submit").onclick = async ()=>{
-        const pw = document.getElementById("decoy-pw").value;
-        const errEl = document.getElementById("decoy-err");
+        <input class="input" type="password" placeholder="${t("new_decoy_password_placeholder")}" id="decoy-pw-change">
+        <div class="err" id="decoy-change-err"></div>
+        <button class="btn btn-primary full" id="decoy-change-submit">${t("save_decoy_btn")}</button>`;
+      document.getElementById("decoy-change-submit").onclick = async ()=>{
+        const pw = document.getElementById("decoy-pw-change").value;
+        const errEl = document.getElementById("decoy-change-err");
         if(pw.length<8){ errEl.textContent=t("err_decoy_min"); return; }
-        try{ await setupDecoy(pw); renderSettings(); showToast(t("toast_decoy_created")); }
-        catch(e){ errEl.textContent=t("err_decoy_failed"); }
+        try{ await setupDecoy(pw); renderSettings(); showToast(t("toast_decoy_changed")); }
+        catch(e2){ errEl.textContent=t("err_decoy_failed"); }
       };
     };
   }
+  document.getElementById("settings-open-landing").onclick = ()=>{ window.location.href = "landing.html"; };
+  document.getElementById("settings-panic-reset").onclick = openPanicReset;
   document.getElementById("settings-stealth").onchange = (e)=>{
     persistSettings(Object.assign({},State.settings,{stealthEnabled:e.target.checked}));
     document.getElementById("stealth-pin-area").classList.toggle("hidden", !e.target.checked);
@@ -1560,6 +1663,96 @@ function renderCategoryManageList(){
       row.querySelector("[data-cancel-cat]").onclick = ()=>renderCategoryManageList();
     });
   });
+}
+
+/* ==================================================================
+   Panic Reset — wipes everything (real vault, decoy vault, settings)
+   and returns the app to a fresh Setup state. Requires the current
+   Master Password entered twice, with a stark warning each time.
+   ================================================================== */
+function openPanicReset(){
+  State.panicStep = 1;
+  renderPanicReset();
+  document.getElementById("modal-panic").classList.remove("hidden");
+}
+function closePanicReset(){
+  document.getElementById("modal-panic").classList.add("hidden");
+  State.panicStep = null;
+}
+function renderPanicReset(){
+  const el = document.getElementById("panic-content");
+  if(State.panicStep === 1){
+    el.innerHTML = `
+      <div class="modal-head">
+        <div class="display-title small-title" style="color:var(--danger);">${ic.warn()} ${t("panic_title")}</div>
+        <button class="icon-btn" id="panic-close">${ic.close()}</button>
+      </div>
+      <div class="modal-body">
+        <div class="warn-box" style="margin-bottom:16px;line-height:1.6;">${ic.warn()} ${t("panic_warning_1")}</div>
+        <div class="field">
+          <div class="field-label">${t("panic_enter_password")}</div>
+          <input class="input" type="password" id="panic-pw-1" autocomplete="current-password">
+        </div>
+        <div class="err" id="panic-err-1"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn full" id="panic-cancel-1">${t("cancel_btn")}</button>
+        <button class="btn btn-danger full" id="panic-next">${t("panic_continue_btn")}</button>
+      </div>`;
+    document.getElementById("panic-close").onclick = closePanicReset;
+    document.getElementById("panic-cancel-1").onclick = closePanicReset;
+    document.getElementById("panic-next").onclick = async ()=>{
+      const pw = document.getElementById("panic-pw-1").value;
+      const errEl = document.getElementById("panic-err-1");
+      const check = await trySlot(State.session.slot, pw);
+      if(!check){ errEl.textContent = t("err_wrong_password"); return; }
+      State.panicStep = 2;
+      renderPanicReset();
+    };
+  } else if(State.panicStep === 2){
+    el.innerHTML = `
+      <div class="modal-head">
+        <div class="display-title small-title" style="color:var(--danger);">${ic.warn()} ${t("panic_title")}</div>
+        <button class="icon-btn" id="panic-close">${ic.close()}</button>
+      </div>
+      <div class="modal-body">
+        <div class="warn-box" style="margin-bottom:16px;line-height:1.6;">${ic.warn()} ${t("panic_warning_2")}</div>
+        <div class="field">
+          <div class="field-label">${t("panic_confirm_password")}</div>
+          <input class="input" type="password" id="panic-pw-2" autocomplete="current-password">
+        </div>
+        <div class="err" id="panic-err-2"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn full" id="panic-cancel-2">${t("cancel_btn")}</button>
+        <button class="btn btn-danger full" id="panic-execute">${t("panic_execute_btn")}</button>
+      </div>`;
+    document.getElementById("panic-close").onclick = closePanicReset;
+    document.getElementById("panic-cancel-2").onclick = closePanicReset;
+    document.getElementById("panic-execute").onclick = async ()=>{
+      const pw = document.getElementById("panic-pw-2").value;
+      const errEl = document.getElementById("panic-err-2");
+      const check = await trySlot(State.session.slot, pw);
+      if(!check){ errEl.textContent = t("err_wrong_password"); return; }
+      await executePanicReset();
+    };
+  }
+}
+async function executePanicReset(){
+  try{ await idbDelete("geopass-real"); }catch(e){ /* ignore */ }
+  try{ await idbDelete("geopass-decoy"); }catch(e){ /* ignore */ }
+  try{ await idbDelete("geopass-settings"); }catch(e){ /* ignore */ }
+  clearTimeout(idleTimer); clearTimeout(saveTimer); clearTimeout(clipboardTimer); clearTimeout(toastTimer);
+  State.session = null;
+  State.settings = Object.assign({}, DEFAULT_SETTINGS);
+  State.view = { searchQ:"", filterCat:null, filterTag:null, filterFav:false, filterRecent:false };
+  State.detailEntryId = null;
+  State.formDraft = null;
+  closePanicReset();
+  applyTheme();
+  applyStaticI18n();
+  goStage("setup");
+  showToast(t("toast_panic_done"));
 }
 
 /* ==================================================================
@@ -1738,6 +1931,7 @@ document.getElementById("add-btn").addEventListener("click", ()=>openForm(null))
 document.getElementById("modal-detail").addEventListener("mousedown",(e)=>{ if(e.target===e.currentTarget) closeDetail(); });
 document.getElementById("modal-form").addEventListener("mousedown",(e)=>{ if(e.target===e.currentTarget) closeForm(); });
 document.getElementById("modal-settings").addEventListener("mousedown",(e)=>{ if(e.target===e.currentTarget) closeSettings(); });
+document.getElementById("modal-panic").addEventListener("mousedown",(e)=>{ if(e.target===e.currentTarget) closePanicReset(); });
 
 /* ==================================================================
    Setup screen bindings

@@ -68,6 +68,9 @@ section{padding:60px 0;}
 .install-steps{margin:0;padding-left:18px;color:var(--text-muted);font-size:13px;line-height:1.8;}
 .install-steps li{margin-bottom:3px;}
 .install-steps strong{color:var(--text);font-weight:600;}
+.install-illustration-note{font-size:12px;color:var(--text-muted);margin-top:14px;font-style:italic;max-width:600px;margin-left:auto;margin-right:auto;}
+.install-illustration{width:100%;border-radius:10px;border:1px solid var(--border);margin-bottom:16px;display:block;}
+.install-card{display:flex;flex-direction:column;}
 
 /* How it works */
 .steps{display:flex;gap:24px;flex-wrap:wrap;counter-reset:step;}
@@ -232,38 +235,50 @@ footer a:hover{color:var(--accent);}
       <div class="eyebrow" data-i18n="instalasi_eyebrow">Instalasi</div>
       <h2 data-i18n="instalasi_title">Bisa diinstal di semua perangkat Anda</h2>
       <p data-i18n="instalasi_sub">Sekali diinstal, aplikasi berjalan seperti aplikasi native — dengan ikonnya sendiri, dan bisa dipakai offline.</p>
+      <p class="install-illustration-note" data-i18n="install_illustration_note">Ilustrasi di bawah adalah panduan visual skematik untuk menunjukkan letak tombol yang perlu dicari — bukan screenshot asli, karena tampilan persis bisa sedikit berbeda tergantung versi browser Anda.</p>
     </div>
     <div class="feature-grid">
-      <div class="feature-card">
+      <div class="feature-card install-card">
+        <img src="landing-assets/install-android.png" alt="Ilustrasi instalasi Android" class="install-illustration">
         <h3 data-i18n="install_android_title">📱 Android (Chrome)</h3>
         <ol class="install-steps" data-i18n="install_android_steps">
           <li>Buka link ini di <strong>Chrome</strong></li>
-          <li>Tap banner "Tambahkan ke Layar Utama" di bawah layar (atau menu <strong>⋮ → Instal aplikasi</strong>)</li>
-          <li>Tap <strong>Instal</strong></li>
+          <li>Tunggu halaman termuat penuh sekali (untuk cache offline)</li>
+          <li>Tap banner "Tambahkan ke Layar Utama" di bawah layar (atau menu <strong>⋮ → Instal aplikasi</strong> jika banner tidak muncul)</li>
+          <li>Tap <strong>Instal</strong> pada dialog konfirmasi</li>
+          <li>Ikon muncul di layar utama / app drawer</li>
         </ol>
       </div>
-      <div class="feature-card">
+      <div class="feature-card install-card">
+        <img src="landing-assets/install-ios.png" alt="Ilustrasi instalasi iPhone" class="install-illustration">
         <h3 data-i18n="install_ios_title">🍎 iPhone / iPad (Safari)</h3>
         <ol class="install-steps" data-i18n="install_ios_steps">
-          <li>Buka link ini di <strong>Safari</strong> (wajib Safari)</li>
-          <li>Tap ikon <strong>Share</strong> (kotak dengan panah ke atas)</li>
-          <li>Tap <strong>Add to Home Screen</strong> → <strong>Add</strong></li>
+          <li>Buka link ini di <strong>Safari</strong> — wajib Safari, Chrome di iOS tidak punya opsi ini</li>
+          <li>Tunggu halaman termuat penuh sekali</li>
+          <li>Tap ikon <strong>Share</strong> (kotak dengan panah ke atas) di bar bawah</li>
+          <li>Scroll dan tap <strong>Add to Home Screen</strong></li>
+          <li>Tap <strong>Add</strong> di pojok kanan atas</li>
         </ol>
       </div>
-      <div class="feature-card">
+      <div class="feature-card install-card">
+        <img src="landing-assets/install-windows.png" alt="Ilustrasi instalasi Windows" class="install-illustration">
         <h3 data-i18n="install_win_title">💻 Windows (Chrome / Edge)</h3>
         <ol class="install-steps" data-i18n="install_win_steps">
           <li>Buka link ini di <strong>Chrome</strong> atau <strong>Edge</strong></li>
-          <li>Klik ikon <strong>Install</strong> di address bar (atau menu <strong>⋮ → Instal aplikasi</strong>)</li>
-          <li>Klik <strong>Install</strong></li>
+          <li>Tunggu halaman termuat penuh sekali</li>
+          <li>Klik ikon <strong>Install</strong> di ujung kanan address bar (kalau tidak terlihat, klik menu <strong>⋮ → Instal aplikasi</strong>)</li>
+          <li>Klik <strong>Install</strong> pada dialog konfirmasi</li>
+          <li>Aplikasi terbuka di jendelanya sendiri, shortcut muncul di Desktop/Start Menu</li>
         </ol>
       </div>
-      <div class="feature-card">
+      <div class="feature-card install-card">
+        <img src="landing-assets/install-mac.png" alt="Ilustrasi instalasi Mac" class="install-illustration">
         <h3 data-i18n="install_mac_title">🖥️ Mac (Safari / Chrome)</h3>
         <ol class="install-steps" data-i18n="install_mac_steps">
-          <li>Safari: menu <strong>File → Add to Dock...</strong></li>
-          <li>atau Chrome: ikon <strong>Install</strong> di address bar</li>
-          <li>Klik <strong>Add</strong> / <strong>Install</strong></li>
+          <li>Safari (macOS Sonoma+): menu <strong>File → Add to Dock...</strong> → <strong>Add</strong></li>
+          <li>atau Chrome: klik ikon <strong>Install</strong> di address bar</li>
+          <li>Klik <strong>Add</strong> / <strong>Install</strong> pada dialog konfirmasi</li>
+          <li>Ikon muncul di Dock</li>
         </ol>
       </div>
     </div>
@@ -340,13 +355,14 @@ var LANDING_I18N = {
     instalasi_title: "Bisa diinstal di semua perangkat Anda",
     instalasi_sub: "Sekali diinstal, aplikasi berjalan seperti aplikasi native — dengan ikonnya sendiri, dan bisa dipakai offline.",
     install_android_title: "📱 Android (Chrome)",
-    install_android_steps: '<li>Buka link ini di <strong>Chrome</strong></li><li>Tap banner "Tambahkan ke Layar Utama" di bawah layar (atau menu <strong>⋮ → Instal aplikasi</strong>)</li><li>Tap <strong>Instal</strong></li>',
+    install_illustration_note: "Ilustrasi di bawah adalah panduan visual skematik untuk menunjukkan letak tombol yang perlu dicari — bukan screenshot asli, karena tampilan persis bisa sedikit berbeda tergantung versi browser Anda.",
+    install_android_steps: '<li>Buka link ini di <strong>Chrome</strong></li><li>Tunggu halaman termuat penuh sekali (untuk cache offline)</li><li>Tap banner "Tambahkan ke Layar Utama" di bawah layar (atau menu <strong>⋮ → Instal aplikasi</strong> jika banner tidak muncul)</li><li>Tap <strong>Instal</strong> pada dialog konfirmasi</li><li>Ikon muncul di layar utama / app drawer</li>',
     install_ios_title: "🍎 iPhone / iPad (Safari)",
-    install_ios_steps: '<li>Buka link ini di <strong>Safari</strong> (wajib Safari)</li><li>Tap ikon <strong>Share</strong> (kotak dengan panah ke atas)</li><li>Tap <strong>Add to Home Screen</strong> → <strong>Add</strong></li>',
+    install_ios_steps: '<li>Buka link ini di <strong>Safari</strong> — wajib Safari, Chrome di iOS tidak punya opsi ini</li><li>Tunggu halaman termuat penuh sekali</li><li>Tap ikon <strong>Share</strong> (kotak dengan panah ke atas) di bar bawah</li><li>Scroll dan tap <strong>Add to Home Screen</strong></li><li>Tap <strong>Add</strong> di pojok kanan atas</li>',
     install_win_title: "💻 Windows (Chrome / Edge)",
-    install_win_steps: '<li>Buka link ini di <strong>Chrome</strong> atau <strong>Edge</strong></li><li>Klik ikon <strong>Install</strong> di address bar (atau menu <strong>⋮ → Instal aplikasi</strong>)</li><li>Klik <strong>Install</strong></li>',
+    install_win_steps: '<li>Buka link ini di <strong>Chrome</strong> atau <strong>Edge</strong></li><li>Tunggu halaman termuat penuh sekali</li><li>Klik ikon <strong>Install</strong> di ujung kanan address bar (kalau tidak terlihat, klik menu <strong>⋮ → Instal aplikasi</strong>)</li><li>Klik <strong>Install</strong> pada dialog konfirmasi</li><li>Aplikasi terbuka di jendelanya sendiri, shortcut muncul di Desktop/Start Menu</li>',
     install_mac_title: "🖥️ Mac (Safari / Chrome)",
-    install_mac_steps: '<li>Safari: menu <strong>File → Add to Dock...</strong></li><li>atau Chrome: ikon <strong>Install</strong> di address bar</li><li>Klik <strong>Add</strong> / <strong>Install</strong></li>',
+    install_mac_steps: '<li>Safari (macOS Sonoma+): menu <strong>File → Add to Dock...</strong> → <strong>Add</strong></li><li>atau Chrome: klik ikon <strong>Install</strong> di address bar</li><li>Klik <strong>Add</strong> / <strong>Install</strong> pada dialog konfirmasi</li><li>Ikon muncul di Dock</li>',
     keamanan_title: "Kenapa Anda bisa percaya aplikasi ini?",
     keamanan_p1: 'GeoPass Vault tidak punya server, tidak punya backend, dan tidak pernah mengirim data Anda kemana pun. Semua enkripsi terjadi langsung di perangkat Anda menggunakan <code>Web Crypto API</code> bawaan browser — teknologi standar yang sama dipakai oleh bank dan aplikasi keamanan lainnya.',
     keamanan_p2: "Kode sumbernya terbuka sepenuhnya di GitHub — siapa pun bisa memeriksa persis apa yang dilakukan aplikasi ini, baris demi baris. Tidak ada iklan, tidak ada pelacakan, tidak ada model bisnis tersembunyi.",
@@ -393,13 +409,14 @@ var LANDING_I18N = {
     instalasi_title: "Installable on all your devices",
     instalasi_sub: "Once installed, it runs like a native app — with its own icon, and works offline.",
     install_android_title: "📱 Android (Chrome)",
-    install_android_steps: '<li>Open this link in <strong>Chrome</strong></li><li>Tap the "Add to Home Screen" banner at the bottom (or menu <strong>⋮ → Install app</strong>)</li><li>Tap <strong>Install</strong></li>',
+    install_illustration_note: "The illustrations below are schematic visual guides showing roughly where to find each button — not real screenshots, since the exact look can vary slightly by browser version.",
+    install_android_steps: '<li>Open this link in <strong>Chrome</strong></li><li>Wait for the page to fully load once (for offline caching)</li><li>Tap the "Add to Home Screen" banner at the bottom (or menu <strong>⋮ → Install app</strong> if the banner doesn\'t appear)</li><li>Tap <strong>Install</strong> on the confirmation dialog</li><li>The icon appears on your home screen / app drawer</li>',
     install_ios_title: "🍎 iPhone / iPad (Safari)",
-    install_ios_steps: '<li>Open this link in <strong>Safari</strong> (must be Safari)</li><li>Tap the <strong>Share</strong> icon (a box with an arrow up)</li><li>Tap <strong>Add to Home Screen</strong> → <strong>Add</strong></li>',
+    install_ios_steps: '<li>Open this link in <strong>Safari</strong> \u2014 must be Safari, Chrome on iOS doesn\'t have this option</li><li>Wait for the page to fully load once</li><li>Tap the <strong>Share</strong> icon (a box with an arrow up) in the bottom bar</li><li>Scroll down and tap <strong>Add to Home Screen</strong></li><li>Tap <strong>Add</strong> in the top-right corner</li>',
     install_win_title: "💻 Windows (Chrome / Edge)",
-    install_win_steps: '<li>Open this link in <strong>Chrome</strong> or <strong>Edge</strong></li><li>Click the <strong>Install</strong> icon in the address bar (or menu <strong>⋮ → Install app</strong>)</li><li>Click <strong>Install</strong></li>',
+    install_win_steps: '<li>Open this link in <strong>Chrome</strong> or <strong>Edge</strong></li><li>Wait for the page to fully load once</li><li>Click the <strong>Install</strong> icon at the right end of the address bar (if not visible, click menu <strong>⋮ → Install app</strong>)</li><li>Click <strong>Install</strong> on the confirmation dialog</li><li>The app opens in its own window, with a shortcut on your Desktop/Start Menu</li>',
     install_mac_title: "🖥️ Mac (Safari / Chrome)",
-    install_mac_steps: '<li>Safari: menu <strong>File → Add to Dock...</strong></li><li>or Chrome: the <strong>Install</strong> icon in the address bar</li><li>Click <strong>Add</strong> / <strong>Install</strong></li>',
+    install_mac_steps: '<li>Safari (macOS Sonoma+): menu <strong>File → Add to Dock...</strong> → <strong>Add</strong></li><li>or Chrome: click the <strong>Install</strong> icon in the address bar</li><li>Click <strong>Add</strong> / <strong>Install</strong> on the confirmation dialog</li><li>The icon appears in the Dock</li>',
     keamanan_title: "Why can you trust this app?",
     keamanan_p1: 'GeoPass Vault has no server, no backend, and never sends your data anywhere. All encryption happens directly on your device using the browser\'s built-in <code>Web Crypto API</code> — the same standard technology used by banks and other security apps.',
     keamanan_p2: "The source code is fully open on GitHub — anyone can check exactly what this app does, line by line. No ads, no tracking, no hidden business model.",
@@ -446,13 +463,14 @@ var LANDING_I18N = {
     instalasi_title: "可安装在您的所有设备上",
     instalasi_sub: "安装后即像原生应用一样运行——拥有自己的图标，并可离线使用。",
     install_android_title: "📱 Android（Chrome）",
-    install_android_steps: '<li>用 <strong>Chrome</strong> 打开此链接</li><li>点击屏幕底部的“添加到主屏幕”提示（或菜单 <strong>⋮ → 安装应用</strong>）</li><li>点击<strong>安装</strong></li>',
+    install_illustration_note: "下方为示意性视觉指南，用于说明大致按钮位置——并非真实截图，因为具体界面可能因浏览器版本略有不同。",
+    install_android_steps: '<li>用 <strong>Chrome</strong> 打开此链接</li><li>等待页面完全加载一次（以便离线缓存）</li><li>点击屏幕底部的“添加到主屏幕”提示（如果没有出现，可点击菜单 <strong>⋮ → 安装应用</strong>）</li><li>在确认对话框中点击<strong>安装</strong></li><li>图标将出现在主屏幕/应用抽屉中</li>',
     install_ios_title: "🍎 iPhone / iPad（Safari）",
-    install_ios_steps: '<li>用 <strong>Safari</strong> 打开此链接（必须是 Safari）</li><li>点击 <strong>分享</strong> 图标（带向上箭头的方框）</li><li>点击 <strong>添加到主屏幕</strong> → <strong>添加</strong></li>',
+    install_ios_steps: '<li>用 <strong>Safari</strong> 打开此链接——必须是 Safari，iOS 上的 Chrome 没有此选项</li><li>等待页面完全加载一次</li><li>点击底部工具栏中的 <strong>分享</strong> 图标（带向上箭头的方框）</li><li>向下滚动并点击 <strong>添加到主屏幕</strong></li><li>点击右上角的 <strong>添加</strong></li>',
     install_win_title: "💻 Windows（Chrome / Edge）",
-    install_win_steps: '<li>用 <strong>Chrome</strong> 或 <strong>Edge</strong> 打开此链接</li><li>点击地址栏中的<strong>安装</strong>图标（或菜单 <strong>⋮ → 安装应用</strong>）</li><li>点击<strong>安装</strong></li>',
+    install_win_steps: '<li>用 <strong>Chrome</strong> 或 <strong>Edge</strong> 打开此链接</li><li>等待页面完全加载一次</li><li>点击地址栏最右侧的<strong>安装</strong>图标（如果看不到，点击菜单 <strong>⋮ → 安装应用</strong>）</li><li>在确认对话框中点击<strong>安装</strong></li><li>应用将在自己的窗口中打开，并在桌面/开始菜单中生成快捷方式</li>',
     install_mac_title: "🖥️ Mac（Safari / Chrome）",
-    install_mac_steps: '<li>Safari：菜单 <strong>文件 → 添加到程序坞...</strong></li><li>或 Chrome：地址栏中的<strong>安装</strong>图标</li><li>点击<strong>添加</strong> / <strong>安装</strong></li>',
+    install_mac_steps: '<li>Safari（macOS Sonoma 及以上）：菜单 <strong>文件 → 添加到程序坞...</strong> → <strong>添加</strong></li><li>或 Chrome：点击地址栏中的<strong>安装</strong>图标</li><li>在确认对话框中点击<strong>添加</strong> / <strong>安装</strong></li><li>图标将出现在程序坞中</li>',
     keamanan_title: "为什么可以信任这款应用？",
     keamanan_p1: 'GeoPass Vault 没有服务器，没有后端，也从不将您的数据发送到任何地方。所有加密都直接在您的设备上使用浏览器内置的 <code>Web Crypto API</code> 完成——这与银行和其他安全应用采用的标准技术相同。',
     keamanan_p2: "源代码在 GitHub 上完全开放——任何人都可以逐行检查这款应用究竟做了什么。没有广告，没有追踪，没有隐藏的商业模式。",
